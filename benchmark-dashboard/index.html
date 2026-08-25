@@ -18,8 +18,30 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script type="module" crossorigin src="/benchmark-dashboard/assets/index-BB6Sj9-R.js"></script>
     <link rel="stylesheet" crossorigin href="/benchmark-dashboard/assets/index-B4tadUib.css">
+    <style>
+      .mek-bar{display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:1px solid #e6dfd4;background:#f7f4ee;font-family:Inter,sans-serif;position:relative;z-index:50}
+      .mek-bar a{color:#7a7268;text-decoration:none;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+      .mek-bar a:hover{color:#6d28d9}
+      .mek-bar svg{width:40px;height:40px;flex:none;filter:drop-shadow(0 0 4px rgb(249 115 22 / .45))}
+      .mek-bar strong{font-size:1.05rem;font-weight:600;color:#3a342c}
+    </style>
   </head>
   <body>
+    <div class="mek-bar">
+      <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="sg" x1="6" y1="36" x2="34" y2="4"><stop offset="0" stop-color="#6d28d9"/><stop offset="1" stop-color="#ea580c"/></linearGradient>
+          <linearGradient id="sl" x1="6" y1="22" x2="34" y2="18"><stop offset="0" stop-color="#c4b5fd"/><stop offset=".5" stop-color="#fb923c"/><stop offset="1" stop-color="#facc15"/></linearGradient>
+        </defs>
+        <rect width="40" height="40" rx="9" fill="url(#sg)"/>
+        <path d="M6 22.5 H11.5 L15.5 9 L21 31 L25.5 17.5 H34" stroke="url(#sl)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="15.5" cy="9" r="2.4" fill="#facc15"/><circle cx="21" cy="31" r="2.4" fill="#ddd6fe"/>
+      </svg>
+      <div>
+        <a href="/">← Mekasone Home</a>
+        <div><strong>Signal Ledger</strong></div>
+      </div>
+    </div>
     <div id="root"></div>
   </body>
 </html>

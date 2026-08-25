@@ -17,8 +17,32 @@
     />
     <script type="module" crossorigin src="/super-computing/assets/index-BjF2RBaW.js"></script>
     <link rel="stylesheet" crossorigin href="/super-computing/assets/index-DSocXsyZ.css">
+    <style>
+      .mek-bar{display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:1px solid rgba(42,41,37,.12);background:#f7f4ee;font-family:"Source Sans 3",sans-serif}
+      .mek-bar a{color:#5c574e;text-decoration:none;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+      .mek-bar a:hover{color:#9f1239}
+      .mek-bar svg{width:40px;height:40px;flex:none;filter:drop-shadow(0 0 4px rgb(244 63 94 / .4))}
+      .mek-bar strong{font-family:"Source Serif 4",serif;font-size:1.05rem;font-weight:600;color:#2a2925}
+    </style>
   </head>
   <body>
+    <div class="mek-bar">
+      <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="eg" x1="4" y1="36" x2="36" y2="4"><stop offset="0" stop-color="#9f1239"/><stop offset="1" stop-color="#fb7185"/></linearGradient>
+          <linearGradient id="eb" x1="8" y1="32" x2="8" y2="8"><stop offset="0" stop-color="#fdba74"/><stop offset="1" stop-color="#fff7ed"/></linearGradient>
+        </defs>
+        <rect width="40" height="40" rx="9" fill="url(#eg)"/>
+        <rect x="7" y="22" width="6.5" height="11" rx="1.5" fill="url(#eb)" opacity=".75"/>
+        <rect x="16.75" y="14" width="6.5" height="19" rx="1.5" fill="url(#eb)" opacity=".9"/>
+        <rect x="26.5" y="8" width="6.5" height="25" rx="1.5" fill="#fff7ed"/>
+        <circle cx="29.75" cy="8" r="2.1" fill="#facc15"/>
+      </svg>
+      <div>
+        <a href="/">← Mekasone Home</a>
+        <div><strong>The Exascale Pivot</strong></div>
+      </div>
+    </div>
     <div id="root"></div>
   </body>
 </html>
