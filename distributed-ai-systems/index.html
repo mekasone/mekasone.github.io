@@ -7,9 +7,9 @@
 <meta name="description" content="An HPC and MPI-oriented explanation of distributed AI systems, partitioned data, replication, interconnects, and failure models.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#20252b;--muted:#68717b;--line:#d9e0e6;--wash:#f3f8fc;--accent:#176b91;--accent-soft:#dff1fb}*{box-sizing:border-box}body{margin:0;color:var(--ink);background:#fbfcfd;font-family:"DM Sans",sans-serif;line-height:1.7}main{max-width:1040px;margin:auto;padding:28px 28px 80px}header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding:0 0 20px;margin-bottom:58px}a{color:inherit;text-decoration:none}.back{font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.back:hover{color:var(--accent)}.kicker{font-size:.78rem;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);font-weight:600;margin:0 0 12px}.title{font-family:Fraunces,serif;font-size:clamp(2.4rem,6vw,4.8rem);line-height:1.02;font-weight:500;max-width:800px;margin:0 0 22px}.intro{font-size:1.18rem;max-width:800px;color:#4f5963;margin:0}.rule{height:1px;background:var(--line);margin:54px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin:28px 0 45px}.card{background:var(--wash);border:1px solid #d8e9f3;border-radius:10px;padding:25px}.card h2{font-family:Fraunces,serif;font-weight:500;font-size:1.55rem;margin:0 0 10px}.card p{margin:0;color:#515e68}.prose{max-width:820px}.prose h2{font-family:Fraunces,serif;font-size:2rem;font-weight:500;line-height:1.2;margin:50px 0 14px}.prose h3{font-size:1.05rem;margin:28px 0 6px;color:var(--accent)}.prose p{margin:0 0 18px}.callout{border-left:4px solid var(--accent);background:#f0f7fb;padding:20px 24px;margin:28px 0;font-size:1.08rem}.diagram{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#202a33;color:#d8edf8;border-radius:8px;padding:22px;overflow:auto;line-height:1.55;margin:24px 0}.footer{border-top:1px solid var(--line);margin-top:65px;padding-top:20px;color:var(--muted);font-size:.88rem}@media(max-width:700px){main{padding:22px 20px 60px}header{margin-bottom:42px}.grid{grid-template-columns:1fr;gap:14px}.title{font-size:3rem}}
+:root{--ink:#20252b;--muted:#5f6973;--line:#d9e0e6;--wash:#f3f8fc;--accent:#176b91;--accent-2:#7b4db3;--code:#202a33}*{box-sizing:border-box}html{font-size:18px}body{margin:0;color:var(--ink);background:#fbfcfd;font-family:"DM Sans",sans-serif;font-size:1rem;line-height:1.62}main{max-width:1080px;margin:auto;padding:24px 30px 64px}header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding:0 0 16px;margin-bottom:38px}a{color:inherit;text-decoration:none}.back{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.back:hover{color:var(--accent)}.kicker{font-size:.72rem;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:0 0 9px}.title{font-family:Fraunces,serif;font-size:clamp(2.25rem,5.5vw,4.15rem);line-height:1.03;font-weight:500;max-width:820px;margin:0 0 15px}.intro{font-size:1.12rem;max-width:850px;color:#4f5963;margin:0}.rule{height:1px;background:var(--line);margin:34px 0}.prose{max-width:940px}.prose h2{font-family:Fraunces,serif;font-size:1.7rem;font-weight:500;line-height:1.18;margin:34px 0 8px;color:#252b31}.prose h3{font-size:1rem;margin:21px 0 4px;color:var(--accent);letter-spacing:.01em}.prose p{margin:0 0 13px}.correction{border-left:4px solid var(--accent-2);background:#f5f0fb;padding:16px 20px;margin:0 0 26px;font-size:1rem}.correction p{margin:0}.diagram{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--code);color:#d8edf8;border-radius:8px;padding:17px 20px;overflow:auto;line-height:1.45;font-size:.83rem;margin:16px 0 21px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:15px 0 25px}.card{background:var(--wash);border:1px solid #d8e9f3;border-radius:9px;padding:17px 19px}.card h3{font-family:Fraunces,serif;font-size:1.2rem;font-weight:500;color:var(--ink);margin:0 0 5px}.card p{margin:0;color:#515e68;font-size:.94rem}.table-wrap{overflow-x:auto;margin:13px 0 20px;border:1px solid var(--line);border-radius:8px}table{width:100%;border-collapse:collapse;font-size:.88rem;line-height:1.42;background:#fff}th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}th{font-weight:700;background:#f3f6f8;color:#36414a}tr:last-child td{border-bottom:0}td:first-child{font-weight:600;color:#315b70;white-space:nowrap}.footer{border-top:1px solid var(--line);margin-top:36px;padding-top:15px;color:var(--muted);font-size:.78rem}@media(max-width:700px){main{padding:19px 19px 48px}header{margin-bottom:30px}.title{font-size:2.7rem}.cards{grid-template-columns:1fr;gap:12px}.diagram{font-size:.72rem;padding:14px}.table-wrap{margin-left:-2px;margin-right:-2px}th,td{padding:8px 9px}}
 </style>
 </head>
 <body><main>
@@ -17,25 +17,102 @@
 <section><p class="kicker">HPC / MPI Perspective</p><h1 class="title">Distributed AI Systems</h1><p class="intro">A non-framework-specific way to think about distributed AI through the lens of CPUs, partitions, replication, and the interconnect.</p></section>
 <div class="rule"></div>
 <section class="prose">
-<p>I used material from “Distributed AI Fundamentals with PyTorch” as the basis for this HPC/MPI-way of explaining the distributed data and computational aspects.</p>
-<div class="callout">To keep the data consistent, AI systems—just as distributed data systems do—keep data in partitions and replicate that data to provide reliable data access.</div>
-<p>HPC systems generally do not follow that same recovery model. When there is a problem, HPC systems typically restart the job rather than trying to recover distributed state in place. They avoid much of the complexity associated with maintaining replicated, continuously available data.</p>
-<h2>Two different operating assumptions</h2>
-<div class="grid"><article class="card"><h2>Distributed AI and data systems</h2><p>Partition data for parallel computation, replicate important state for reliable access, and use communication to maintain consistency or exchange partial results.</p></article><article class="card"><h2>HPC systems</h2><p>Use many CPUs and a fast interconnect to execute a coordinated computation, but commonly treat failure as a job-level event: stop, restart, and run again.</p></article></div>
-<h2>Several CPUs, one interconnect</h2>
-<p>Consider a cluster with multiple nodes, each containing several CPUs. Every participating process has a logical rank, a local partition of work, and access to the cluster interconnect. The interconnect is not incidental: it determines how quickly processes can exchange data, synchronize, and continue to the next phase.</p>
-<div class="diagram">CPU / memory       CPU / memory       CPU / memory
-     │                   │                   │
-    NIC ─────────────── fabric / interconnect ─────────────── NIC
-     │                   │                   │
-  process 0           process 1           process 2
-  partition A         partition B         partition C</div>
-<h2>Communication follows the operation</h2>
-<p>Processes communicate according to the result they need. An aggregate may be reduced across all ranks; a configuration may be broadcast from one rank; partitions may be scattered or gathered; and a repartitioning phase may exchange different data between every pair of ranks.</p>
-<p>In distributed AI, these operations help maintain consistent model or data state while work is performed in parallel. In HPC, the same communication patterns support the computation, but the system typically does not attempt to preserve the entire distributed execution state after a failure.</p>
-<h2>Why the distinction matters</h2>
-<p>Replication and recovery add cost: more storage, more network traffic, coordination, and additional failure modes. Distributed AI and distributed data platforms accept that complexity because reliable access and continued service are part of the objective. HPC systems often optimize for a different objective—maximum throughput for a bounded computation—and rely on restart mechanisms when the computation fails.</p>
-<p>Both approaches use partitioning, parallel processes, and high-speed interconnects. They differ in what they promise when part of the system fails.</p>
+<div class="correction"><p>I used material from “Distributed AI Fundamentals with PyTorch” as the basis for this HPC/MPI-way of explanation for the distributed data / computational aspect. To keep the data consistent, AI systems (just as the distributed data systems do) to keep the data in partitions and replicate that data to provide reliable data access; HPC systems do not - HPC systems restart whenever there is a problem, they typically do not try to recover and they avoid this complexity. HPC / super computers use interconnect often.</p></div>
+<h2>1. The physical picture</h2>
+<p>Assume a cluster with:</p><ul><li>Four compute nodes</li><li>Eight CPUs per node</li><li>32 participating processes in total</li><li>A high-speed network such as InfiniBand</li><li>Each process attached to a CPU core or CPU socket</li></ul>
+<div class="diagram">                    Distributed application
+                             │
+                    Communication patterns
+                  AllReduce / Gather / Scatter
+                             │
+                       MPI-style runtime
+                             │
+                    Network topology and routing
+                             │
+              InfiniBand / RDMA / Ethernet interconnect
+                             │
+                 CPUs, memory, NUMA, PCIe, NICs</div>
+<p>This corresponds closely to a layered distributed-computation model:</p><ol><li>Application or framework layer</li><li>Data organization layer</li><li>Collective operations layer</li><li>Communication and runtime layer</li><li>Topology layer</li><li>Physical hardware and links</li></ol>
+<p>The framework-specific names can be replaced with MPI concepts without changing the underlying distributed-systems ideas.</p>
+<h2>2. Processes, ranks, and world size</h2>
+<p>In an HPC program, every participating process belongs to a communicator. The communicator defines the group of processes that cooperate.</p>
+<p>Each process has a <strong>rank</strong>, its unique identifier within the communicator; a <strong>world size</strong>, the total number of processes; a <strong>local rank</strong>, its position within a node; and a <strong>global rank</strong>, its position across the cluster.</p>
+<div class="diagram">Node 0: local ranks 0–7    global ranks 0–7
+Node 1: local ranks 0–7    global ranks 8–15
+Node 2: local ranks 0–7    global ranks 16–23
+Node 3: local ranks 0–7    global ranks 24–31</div>
+<p>The rank is a logical identity, not inherently a CPU identifier. Runtime placement maps ranks to cores, sockets, NUMA domains, and nodes. That mapping affects latency, bandwidth, and failure behavior.</p>
+<h2>3. Local data versus global data</h2>
+<p>Suppose the application processes a 3.2-billion-row dataset. A distributed design partitions the data so each rank performs local computation against its own share.</p>
+<div class="diagram">Rank 0: rows     0–99,999,999
+Rank 1: rows   100–199,999,999
+Rank 2: rows   200–299,999,999
+...
+Rank 31: final partition</div>
+<p>Each rank computes a local result. The system then determines whether it needs a result from every rank, one aggregate result, the complete result on every rank, different data sent to different ranks, or a synchronized state update. That requirement determines the communication primitive.</p>
+<h2>4. Collective operations in a CPU data system</h2>
+<h3>AllReduce: aggregate and replicate</h3><p>AllReduce combines a value from every rank and places the final aggregate on every rank. If each process computes a local count, an AllReduce with <code>SUM</code> produces the global count everywhere.</p><p>The pattern is: <strong>many local values → one aggregate → replicated everywhere</strong>. It can support global row counts, error totals, convergence criteria, distributed statistics, and a shared termination decision. Optimized implementations use tree, ring, or hierarchical algorithms rather than making one process the sole bottleneck.</p>
+<h3>Reduce: aggregate to one rank</h3><p>Reduce combines values from all ranks but delivers the result only to a designated root. It fits a final summary, centralized checkpoint metadata, one coordinator deciding whether processing is complete, or aggregated profiling output. Reduce followed by Broadcast is semantically equivalent to AllReduce when every rank needs the result.</p>
+<h3>Broadcast: one value to everyone</h3><p>Broadcast sends data from one root rank to all other ranks. It can distribute a query plan, filter definition, lookup table, partitioning policy, job epoch, or control message. Broadcast is different from Scatter: every rank receives the same object.</p>
+<h3>Scatter: distribute different partitions</h3><p>Scatter sends a different chunk to each rank. It resembles assigning partitions to workers, but it is often undesirable for rank 0 to load an entire large dataset before distributing it. For very large data, each rank commonly reads its own partition from parallel storage.</p>
+<h3>Gather: collect partitions at one rank</h3><p>Gather sends data from every rank to one root. It works for per-rank metrics, error summaries, small result sets, and diagnostics. It becomes dangerous when the result is large because the root becomes both a memory bottleneck and a network hotspot.</p>
+<h3>AllGather: collect and replicate</h3><p>AllGather collects data from all ranks and gives the complete concatenated result to every rank. It is useful when every process needs a global view, but replication across all ranks makes it expensive for large datasets.</p>
+<h3>ReduceScatter: aggregate and partition</h3><p>ReduceScatter reduces corresponding values across ranks and gives each rank only its assigned portion of the reduced result. The pattern is: <strong>many distributed inputs → aggregate → distributed output</strong>. It supports partitioned aggregations, ownership-based updates, distributed histograms, and per-shard statistics without creating a complete copy everywhere.</p>
+<h3>All-to-All: exchange personalized partitions</h3><p>All-to-All allows every rank to send different data to every other rank. This is the communication pattern behind hash redistribution, range repartitioning, distributed joins, global sorts, and large-scale shuffles.</p><p>It is potentially the most communication-intensive collective because every rank may communicate with every other rank. At scale, network and memory pressure can dominate computation.</p>
+<h2>5. Data parallelism versus partitioned data processing</h2>
+<p>The data-parallel pattern is straightforward: every process has the same program and configuration, each process owns a different data partition, each computes locally, and processes exchange only required summaries or intermediate data.</p>
+<div class="diagram">local computation
+       ↓
+small collective communication
+       ↓
+more local computation</div>
+<p>The less data that crosses the interconnect, the better the scaling tends to be.</p>
+<h2>6. Replicated versus sharded state</h2>
+<div class="cards"><article class="card"><h3>Replicated state</h3><p>Every rank stores a complete copy. Access is simple and local, but memory is duplicated and updates must be synchronized.</p></article><article class="card"><h3>Sharded state</h3><p>Each rank stores only a portion. Total state can exceed one node’s memory, but remote lookups, rebalancing, and failure handling become more complex.</p></article></div>
+<p>A sharded distributed index illustrates the trade-off. If a process receives a key owned by another rank, it can send the request to the owner, replicate enough index state locally, or redistribute the original data so requests become local.</p>
+<h2>7. Bucketing and message efficiency</h2>
+<p>Many small messages are usually less efficient than fewer larger messages. Every message carries fixed runtime, NIC, protocol, scheduling, and synchronization overhead.</p>
+<div class="diagram">10,000 messages × 4 KB  →  100 messages × 400 KB</div>
+<p>The same principle applies to distributed data systems: batch remote reads, coalesce small records, aggregate before sending, use partition-aware buffering, avoid per-row RPCs, and prefer bulk exchange during a shuffle. Excessively large messages can still increase latency, so the practical goal is balanced batching.</p>
+<h2>8. Communication is shaped by the interconnect</h2>
+<p>CPU and memory configuration alone does not determine performance. A transfer may cross a CPU memory bus, a NUMA boundary, PCIe, a network interface, the physical fabric, and the receiving node’s PCIe and memory hierarchy.</p>
+<h3>Intra-node communication</h3><p>Within a node, processes may communicate through shared memory, CPU caches, NUMA memory, or PCIe-connected devices. This is usually lower latency than inter-node communication, although crossing NUMA sockets can still be expensive.</p>
+<h3>Inter-node communication</h3><p>Between nodes, data travels through network interface cards, switches, and fabric links. InfiniBand with RDMA can reduce CPU involvement and latency. Ethernet is common and flexible, with performance depending on its configuration.</p>
+<h3>Topology</h3><p>Fat-tree, dragonfly, torus, mesh, and other topologies determine hop count, oversubscription, link contention, all-to-all behavior, and the effect of failures on alternate routes.</p>
+<h2>9. Synchronization and the “hung job” problem</h2>
+<p>Collectives are usually collective in the strict sense: every participating rank must call the operation in the expected order.</p>
+<div class="diagram">Rank 0: AllReduce → Broadcast → Gather
+Rank 1: AllReduce → Broadcast → Gather
+Rank 2: AllReduce → Broadcast → Gather</div>
+<p>If one rank skips the AllReduce, the others can wait indefinitely. The network may be healthy; the distributed program is inconsistent.</p>
+<p>Debugging should proceed down the stack: confirm every rank is alive; verify that every rank entered the same collective; check communicator, data shape, and message size; verify process placement; then inspect interconnect reachability, congestion, and fabric configuration.</p>
+<h2>10. Overlap computation and communication</h2>
+<p>A distributed application performs best when communication overlaps useful computation.</p>
+<div class="diagram">Compute partition 0 ──┐
+                      ├── exchange partition 0
+Compute partition 1 ──┘
+
+Compute partition 2 ──┐
+                      ├── exchange partition 2
+Compute partition 3 ──┘</div>
+<p>Instead of waiting for all local work to finish, an application can send completed partitions, continue computing other partitions, receive remote data, and synchronize only when the next phase needs it. This applies to distributed matrix operations, stencil computations, partitioned joins, iterative solvers, graph algorithms, and simulations.</p>
+<h2>11. Mapping the concepts to a CPU data application</h2>
+<div class="table-wrap"><table><thead><tr><th>Distributed concept</th><th>CPU / HPC data-system equivalent</th></tr></thead><tbody><tr><td>Process group</td><td>MPI communicator or worker group</td></tr><tr><td>Rank</td><td>Logical worker identity</td></tr><tr><td>World size</td><td>Number of participating processes</td></tr><tr><td>Local rank</td><td>Worker position within a node</td></tr><tr><td>Data shard</td><td>Local table, matrix, graph, or file partition</td></tr><tr><td>AllReduce</td><td>Global aggregation replicated to all workers</td></tr><tr><td>Reduce</td><td>Global aggregation delivered to one coordinator</td></tr><tr><td>Broadcast</td><td>Distribute a plan, configuration, or lookup structure</td></tr><tr><td>Scatter</td><td>Send different partitions from one source</td></tr><tr><td>Gather</td><td>Collect results at one destination</td></tr><tr><td>AllGather</td><td>Replicate all workers’ results everywhere</td></tr><tr><td>ReduceScatter</td><td>Aggregate while preserving distributed ownership</td></tr><tr><td>All-to-All</td><td>Global repartition, shuffle, or redistribution</td></tr><tr><td>Gradient bucket</td><td>Batched or coalesced messages</td></tr><tr><td>Communication backend</td><td>MPI communication runtime</td></tr><tr><td>Topology</td><td>CPU, NUMA, PCIe, NIC, and fabric topology</td></tr></tbody></table></div>
+<h2>12. The most important conceptual translation</h2>
+<p>A high-level distributed operation is implemented by a stack of increasingly lower-level mechanisms, and performance or failure can originate at any layer.</p>
+<div class="diagram">Application: distributed aggregation or shuffle
+        ↓
+Logical operation: AllReduce, Gather, Scatter, All-to-All
+        ↓
+Runtime: MPI collective implementation
+        ↓
+Topology: rank placement, NUMA layout, network fabric
+        ↓
+Transport: shared memory, TCP, RDMA
+        ↓
+Hardware: CPU cores, memory bandwidth, NICs, switches</div>
+<p>If an aggregation is slow, possible explanations include too much data being reduced, poor partitioning, too many small messages, a root bottleneck, NUMA misplacement, network oversubscription, a topology-unfriendly algorithm, or insufficient overlap between computation and communication.</p>
+<p>The central lesson is not specific to a Python library. It is that distributed computation must be understood across the application, communication, runtime, topology, transport, and hardware layers. Distributed AI and distributed data platforms accept the complexity of partitioning, replication, and coordination when reliable access and continued service are part of the objective. HPC systems often optimize for maximum throughput for a bounded computation and rely on restarting the job when the computation fails.</p>
 </section>
 <footer class="footer">Mekasone · Distributed AI Systems</footer>
 </main></body></html>
