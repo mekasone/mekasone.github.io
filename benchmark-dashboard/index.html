@@ -24,7 +24,21 @@
       .mek-bar a:hover{color:#6d28d9}
       .mek-bar svg{width:40px;height:40px;flex:none;filter:drop-shadow(0 0 4px rgb(249 115 22 / .45))}
       .mek-bar strong{font-size:1.05rem;font-weight:600;color:#3a342c}
-    </style>
+    
+      /* Compact, persistent Workspace navigation */
+      .instrument-app { grid-template-columns: 208px minmax(0, 1fr); transition: grid-template-columns .2s ease; }
+      .instrument-sidebar { position: relative; }
+      .sidebar-collapse-toggle { position: absolute; top: 12px; right: 10px; z-index: 2; width: 27px; height: 27px; border: 1px solid #eeeae238; border-radius: 6px; color: #b9b3a6; background: #ffffff0d; cursor: pointer; font: 18px/1 Arial, sans-serif; transition: color .16s, background-color .16s, border-color .16s; }
+      .sidebar-collapse-toggle:hover { color: #fcfbf8; background: #f1724b26; border-color: #f1724b66; }
+      .instrument-app.is-sidebar-collapsed { grid-template-columns: 58px minmax(0, 1fr); }
+      .instrument-app.is-sidebar-collapsed .instrument-sidebar { padding-left: 10px; padding-right: 10px; }
+      .instrument-app.is-sidebar-collapsed .brand-lockup { justify-content: center; padding-left: 0; padding-right: 0; }
+      .instrument-app.is-sidebar-collapsed .brand-lockup > div:nth-child(2), .instrument-app.is-sidebar-collapsed .sidebar-label, .instrument-app.is-sidebar-collapsed .sidebar-footer { display: none; }
+      .instrument-app.is-sidebar-collapsed .sidebar-nav-item { justify-content: center; padding-left: 0; padding-right: 0; }
+      .instrument-app.is-sidebar-collapsed .sidebar-nav-item span { display: none; }
+      .instrument-app.is-sidebar-collapsed .sidebar-collapse-toggle { right: 15px; }
+      @media (max-width: 720px) { .sidebar-collapse-toggle { display: none; } .instrument-app { transition: none; } }
+</style>
   </head>
   <body>
     <div class="mek-bar">
@@ -43,5 +57,47 @@
       </div>
     </div>
     <div id="root"></div>
+    <script>
+      (() => {
+        const storageKey = 'signal-ledger-sidebar-collapsed';
+        const mountSidebarToggle = () => {
+          const app = document.querySelector('.instrument-app');
+          const sidebar = document.querySelector('.instrument-sidebar');
+          if (!app || !sidebar) return false;
+          if (sidebar.querySelector('.sidebar-collapse-toggle')) return true;
+          const button = document.createElement('button');
+          button.className = 'sidebar-collapse-toggle';
+          button.type = 'button';
+          button.setAttribute('aria-label', 'Collapse workspace navigation');
+          button.setAttribute('aria-expanded', 'true');
+          button.title = 'Collapse workspace navigation';
+          const setCollapsed = (collapsed) => {
+            app.classList.toggle('is-sidebar-collapsed', collapsed);
+            button.textContent = collapsed ? '›' : '‹';
+            button.setAttribute('aria-expanded', String(!collapsed));
+            button.setAttribute('aria-label', collapsed ? 'Expand workspace navigation' : 'Collapse workspace navigation');
+            button.title = collapsed ? 'Expand workspace navigation' : 'Collapse workspace navigation';
+            try { localStorage.setItem(storageKey, String(collapsed)); } catch (_) {}
+          };
+          button.addEventListener('click', () => setCollapsed(!app.classList.contains('is-sidebar-collapsed')));
+          sidebar.appendChild(button);
+          let collapsed = false;
+          try { collapsed = localStorage.getItem(storageKey) === 'true'; } catch (_) {}
+          setCollapsed(collapsed);
+          return true;
+        };
+        const boot = () => {
+          if (mountSidebarToggle()) return;
+          const root = document.getElementById('root');
+          if (!root) return;
+          const observer = new MutationObserver(() => {
+            if (mountSidebarToggle()) observer.disconnect();
+          });
+          observer.observe(root, { childList: true, subtree: true });
+        };
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+      })();
+    </script>
+
   </body>
 </html>
