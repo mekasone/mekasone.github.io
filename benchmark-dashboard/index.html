@@ -27,7 +27,7 @@
     
       /* Compact, persistent Workspace navigation */
       .instrument-app { grid-template-columns: 208px minmax(0, 1fr); transition: grid-template-columns .2s ease; }
-      .instrument-sidebar { position: relative; }
+      .instrument-sidebar { position: relative; padding-top: 44px; }
       .sidebar-collapse-toggle { position: absolute; top: 12px; right: 10px; z-index: 2; width: 27px; height: 27px; border: 1px solid #eeeae238; border-radius: 6px; color: #b9b3a6; background: #ffffff0d; cursor: pointer; font: 18px/1 Arial, sans-serif; transition: color .16s, background-color .16s, border-color .16s; }
       .sidebar-collapse-toggle:hover { color: #fcfbf8; background: #f1724b26; border-color: #f1724b66; }
       .instrument-app.is-sidebar-collapsed { grid-template-columns: 58px minmax(0, 1fr); }
@@ -37,7 +37,7 @@
       .instrument-app.is-sidebar-collapsed .sidebar-nav-item { justify-content: center; padding-left: 0; padding-right: 0; }
       .instrument-app.is-sidebar-collapsed .sidebar-nav-item span { display: none; }
       .instrument-app.is-sidebar-collapsed .sidebar-collapse-toggle { right: 15px; }
-      @media (max-width: 720px) { .sidebar-collapse-toggle { display: none; } .instrument-app { transition: none; } }
+      @media (max-width: 720px) { .sidebar-collapse-toggle { display: none; } .instrument-sidebar { padding-top: 15px; } .instrument-app { transition: none; } }
 </style>
   </head>
   <body>
