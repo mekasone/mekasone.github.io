@@ -1,0 +1,24 @@
+{
+  "name": "PLU Code Lookup",
+  "short_name": "PLU Lookup",
+  "description": "Fast PLU code lookup tool for grocery store cashiers",
+  "start_url": "/grocerystore/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#2c3e50",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "business",
+    "productivity",
+    "utilities"
+  ],
+  "scope": "/grocerystore/"
+}
