@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>PLU Code Lookup</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.svg">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app-container">
+        <!-- Display Area (like calculator screen) -->
+        <div id="display-section">
+            <div id="search-input-display">
+                <span id="search-mode">BY CODE:</span>
+                <span id="search-value"></span>
+                <span class="cursor-blink">|</span>
+            </div>
+            
+            <div id="results-display">
+                <!-- 8 lines display area -->
+                <div class="result-line" data-index="0">
+                    <span class="line-number">1</span>
+                    <span class="plu-code">----</span>
+                    <span class="plu-name">READY</span>
+                </div>
+                <div class="result-line" data-index="1">
+                    <span class="line-number">2</span>
+                    <span class="plu-code">----</span>
+                    <span class="plu-name">LOAD DATABASE</span>
+                </div>
+                <div class="result-line" data-index="2">
+                    <span class="line-number">3</span>
+                    <span class="plu-code">----</span>
+                    <span class="plu-name"></span>
+                </div>
+                <div class="result-line" data-index="3">
+                    <span class="line-number">4</span>
+                    <span class="plu-code">----</span>
+                    <span class="plu-name"></span>
+                </div>
+                <div class="result-line" data-index="4">
+                    <span class="line-number">5</span>
+                    <span class="plu-code">----</span>
+                    <span class="plu-name"></span>
+                </div>
+                <div class="result-line" data-index="5">
+                    <span class="line-number">6</span>
+                    <span class="plu-code">----</span>
+                    <span class="plu-name"></span>
+                </div>
+                <div class="result-line" data-index="6">
+                    <span class="line-number">7</span>
+                    <span class="plu-code">----</span>
+                    <span class="plu-name"></span>
+                </div>
+                <div class="result-line" data-index="7">
+                    <span class="line-number">8</span>
+                    <span class="plu-code">----</span>
+                    <span class="plu-name"></span>
+                </div>
+            </div>
+
+            <div id="status-bar">
+                <span id="db-count">Items: 0</span>
+                <span id="sort-status">Sort: CODE</span>
+                <span id="page-info">Page: 1/1</span>
+            </div>
+        </div>
+
+        <!-- Control Buttons Section -->
+        <div id="button-section">
+            <!-- Function Buttons Row 1 -->
+            <div class="button-row">
+                <button class="function-btn" id="btn-speak" title="Speak selected item">
+                    <span class="btn-icon">🔊</span>
+                    <span class="btn-label">SPEAK</span>
+                </button>
+                <button class="function-btn" id="btn-voice" title="Voice search">
+                    <span class="btn-icon">🎤</span>
+                    <span class="btn-label">VOICE</span>
+                </button>
+                <button class="function-btn" id="btn-sort" title="Toggle sort order">
+                    <span class="btn-icon">⇅</span>
+                    <span class="btn-label">SORT</span>
+                </button>
+                <button class="function-btn" id="btn-delete" title="Delete selected item">
+                    <span class="btn-icon">🗑</span>
+                    <span class="btn-label">DELETE</span>
+                </button>
+            </div>
+
+            <!-- Function Buttons Row 2 -->
+            <div class="button-row">
+                <button class="function-btn" id="btn-by-id" title="Search by PLU code">
+                    <span class="btn-icon">#</span>
+                    <span class="btn-label">BY ID</span>
+                </button>
+                <button class="function-btn" id="btn-by-name" title="Search by name">
+                    <span class="btn-icon">ABC</span>
+                    <span class="btn-label">BY NAME</span>
+                </button>
+                <button class="function-btn" id="btn-upload" title="Upload CSV database">
+                    <span class="btn-icon">📂</span>
+                    <span class="btn-label">LOAD</span>
+                </button>
+                <button class="function-btn" id="btn-theme" title="Toggle light/dark theme">
+                    <span class="btn-icon">☀</span>
+                    <span class="btn-label">THEME</span>
+                </button>
+            </div>
+
+            <!-- Alphanumeric Keypad -->
+            <div id="keypad-section">
+                <!-- Letters Row 1 -->
+                <div class="keypad-row">
+                    <button class="key-btn letter-key" data-key="A">A</button>
+                    <button class="key-btn letter-key" data-key="B">B</button>
+                    <button class="key-btn letter-key" data-key="C">C</button>
+                    <button class="key-btn letter-key" data-key="D">D</button>
+                    <button class="key-btn letter-key" data-key="E">E</button>
+                </div>
+                
+                <!-- Letters Row 2 -->
+                <div class="keypad-row">
+                    <button class="key-btn letter-key" data-key="F">F</button>
+                    <button class="key-btn letter-key" data-key="G">G</button>
+                    <button class="key-btn letter-key" data-key="H">H</button>
+                    <button class="key-btn letter-key" data-key="I">I</button>
+                    <button class="key-btn letter-key" data-key="J">J</button>
+                </div>
+                
+                <!-- Letters Row 3 -->
+                <div class="keypad-row">
+                    <button class="key-btn letter-key" data-key="K">K</button>
+                    <button class="key-btn letter-key" data-key="L">L</button>
+                    <button class="key-btn letter-key" data-key="M">M</button>
+                    <button class="key-btn letter-key" data-key="N">N</button>
+                    <button class="key-btn letter-key" data-key="O">O</button>
+                </div>
+                
+                <!-- Letters Row 4 -->
+                <div class="keypad-row">
+                    <button class="key-btn letter-key" data-key="P">P</button>
+                    <button class="key-btn letter-key" data-key="Q">Q</button>
+                    <button class="key-btn letter-key" data-key="R">R</button>
+                    <button class="key-btn letter-key" data-key="S">S</button>
+                    <button class="key-btn letter-key" data-key="T">T</button>
+                </div>
+                
+                <!-- Letters Row 5 -->
+                <div class="keypad-row">
+                    <button class="key-btn letter-key" data-key="U">U</button>
+                    <button class="key-btn letter-key" data-key="V">V</button>
+                    <button class="key-btn letter-key" data-key="W">W</button>
+                    <button class="key-btn letter-key" data-key="X">X</button>
+                    <button class="key-btn letter-key" data-key="Y">Y</button>
+                </div>
+                
+                <!-- Letters Row 6 -->
+                <div class="keypad-row">
+                    <button class="key-btn letter-key" data-key="Z">Z</button>
+                    <button class="key-btn letter-key" data-key=" ">SPACE</button>
+                    <button class="key-btn special-key" data-key="BACK">⌫</button>
+                    <button class="key-btn special-key" data-key="CLEAR">CLR</button>
+                </div>
+
+                <!-- Numbers Row -->
+                <div class="keypad-row">
+                    <button class="key-btn number-key" data-key="1">1</button>
+                    <button class="key-btn number-key" data-key="2">2</button>
+                    <button class="key-btn number-key" data-key="3">3</button>
+                    <button class="key-btn number-key" data-key="4">4</button>
+                    <button class="key-btn number-key" data-key="5">5</button>
+                </div>
+                
+                <div class="keypad-row">
+                    <button class="key-btn number-key" data-key="6">6</button>
+                    <button class="key-btn number-key" data-key="7">7</button>
+                    <button class="key-btn number-key" data-key="8">8</button>
+                    <button class="key-btn number-key" data-key="9">9</button>
+                    <button class="key-btn number-key" data-key="0">0</button>
+                </div>
+
+                <!-- Special Characters Row -->
+                <div class="keypad-row">
+                    <button class="key-btn special-key" data-key="$">$</button>
+                    <button class="key-btn special-key" data-key="#">#</button>
+                    <button class="key-btn special-key" data-key="@">@</button>
+                    <button class="key-btn action-key" id="btn-up">▲</button>
+                    <button class="key-btn action-key" id="btn-down">▼</button>
+                </div>
+
+                <!-- Search and Select Row -->
+                <div class="keypad-row">
+                    <button class="key-btn action-key full-width" id="btn-search">🔍 SEARCH</button>
+                    <button class="key-btn action-key full-width" id="btn-select">✓ SELECT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden file input for CSV upload -->
+        <input type="file" id="csv-file-input" accept=".csv,.txt" style="display: none;">
+
+        <!-- Voice Recognition Indicator -->
+        <div id="voice-indicator" class="hidden">
+            <div class="voice-animation"></div>
+            <p>Listening...</p>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toast-container"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
