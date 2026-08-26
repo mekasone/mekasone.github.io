@@ -1,0 +1,2229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code Field Guide — macOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FBF7EE;
+    --paper-warm: #F5EFE0;
+    --surface: #FFFFFF;
+    --surface-elev: #FEFCF6;
+    --border: #E5DCC8;
+    --border-strong: #C9BEA3;
+    --ink: #1F1B16;
+    --ink-soft: #4A443B;
+    --ink-mute: #847B6C;
+    --ink-dim: #B5AC9A;
+    --accent: #B53D2B;
+    --accent-bg: #FBE8E0;
+    --accent-soft: #DC6748;
+    --green: #2B5F4A;
+    --green-bg: #E0EBE3;
+    --plum: #6B4A8B;
+    --plum-bg: #EAE0F0;
+    --code-bg: #F4EEDF;
+    --shadow-sm: 0 1px 2px rgba(31, 27, 22, 0.05);
+    --shadow-md: 0 4px 14px rgba(31, 27, 22, 0.08);
+    --shadow-lg: 0 12px 36px rgba(31, 27, 22, 0.14);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Sans 3', system-ui, sans-serif;
+    font-size: 16.5px;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: var(--accent);
+    width: 0%;
+    z-index: 1000;
+    transition: width 0.1s ease;
+  }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(251, 247, 238, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .topbar-brand { display: flex; align-items: center; gap: 14px; }
+  .topbar-brand .mark {
+    font-family: 'Spectral', serif;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--accent);
+    letter-spacing: -0.01em;
+  }
+  .topbar-brand .title {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .topbar-brand .ver {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+    padding: 4px 10px;
+    background: var(--paper-warm);
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  .mac-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+  }
+  .mac-badge::before { content: '⌘'; font-size: 13px; }
+
+  .topbar-controls { display: flex; align-items: center; gap: 8px; }
+  .ctrl-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    background: var(--surface);
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: all 0.15s;
+    box-shadow: var(--shadow-sm);
+  }
+  .ctrl-btn:hover {
+    border-color: var(--border-strong);
+    background: var(--surface-elev);
+    color: var(--ink);
+  }
+  .ctrl-btn.active {
+    background: var(--accent);
+    color: var(--paper);
+    border-color: var(--accent);
+  }
+  .ctrl-btn .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ink-dim);
+    transition: all 0.15s;
+  }
+  .ctrl-btn.active .dot { background: var(--paper); }
+
+  /* ============ LAYOUT ============ */
+  .shell {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    max-width: 1480px;
+    margin: 0 auto;
+    transition: grid-template-columns 0.3s ease;
+  }
+  .shell.sandbox-open {
+    grid-template-columns: 280px 1fr 440px;
+  }
+  @media (max-width: 1100px) {
+    .shell, .shell.sandbox-open { grid-template-columns: 1fr; }
+    .side-nav { display: none; }
+    .sandbox-frame { display: none !important; }
+  }
+
+  /* ============ SIDE NAV ============ */
+  .side-nav {
+    position: sticky;
+    top: 64px;
+    align-self: start;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+    padding: 36px 24px 40px;
+    border-right: 1px solid var(--border);
+  }
+  .side-nav .nav-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+    margin-bottom: 22px;
+    font-weight: 600;
+  }
+  .side-nav a {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 9px 0 9px 16px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-size: 15.5px;
+    line-height: 1.35;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+    margin-left: -16px;
+    font-weight: 500;
+  }
+  .side-nav a .num {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--ink-mute);
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 22px;
+  }
+  .side-nav a:hover, .side-nav a.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+  }
+  .side-nav a:hover .num, .side-nav a.active .num { color: var(--accent); }
+
+  /* ============ MAIN ============ */
+  main {
+    padding: 52px 64px 120px;
+    max-width: 880px;
+  }
+  @media (max-width: 1100px) { main { padding: 40px 24px 80px; } }
+
+  .hero { margin-bottom: 80px; }
+  .hero .kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 600;
+    margin-bottom: 22px;
+  }
+  .hero h1 {
+    font-family: 'Spectral', serif;
+    font-weight: 500;
+    font-size: clamp(40px, 6vw, 64px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 22px;
+    color: var(--ink);
+  }
+  .hero h1 em { font-style: italic; color: var(--accent); font-weight: 500; }
+  .hero .lede {
+    font-family: 'Spectral', serif;
+    font-size: 20px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 620px;
+    margin-bottom: 28px;
+  }
+  .hero .quick-tips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 18px 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    box-shadow: var(--shadow-sm);
+  }
+  .hero .quick-tips strong { color: var(--ink); font-weight: 600; }
+
+  .scene {
+    margin-bottom: 88px;
+    scroll-margin-top: 88px;
+    transition: opacity 0.2s;
+  }
+  .scene-head {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: 26px;
+    margin-bottom: 28px;
+    align-items: baseline;
+  }
+  @media (max-width: 600px) { .scene-head { grid-template-columns: 1fr; gap: 4px; } }
+
+  .scene-num {
+    font-family: 'Spectral', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 56px;
+    color: var(--accent);
+    line-height: 1;
+    text-align: right;
+    opacity: 0.45;
+  }
+  @media (max-width: 600px) { .scene-num { text-align: left; font-size: 42px; } }
+
+  .scene-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .scene-title {
+    font-family: 'Spectral', serif;
+    font-weight: 500;
+    font-size: 34px;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .scene-title em { font-style: italic; color: var(--accent); }
+
+  .scene-body p {
+    margin-bottom: 16px;
+    color: var(--ink);
+    font-size: 16.5px;
+    line-height: 1.7;
+  }
+  .scene-body p.note {
+    padding: 14px 18px;
+    background: var(--accent-bg);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin: 22px 0;
+  }
+  .scene-body p.note::before {
+    content: 'When this matters · ';
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-right: 4px;
+  }
+
+  code.cmd, code.kbd, code.env {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85em;
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid;
+    cursor: pointer;
+    transition: all 0.12s;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  code.cmd { background: var(--accent-bg); color: var(--accent); border-color: rgba(181, 61, 43, 0.18); }
+  code.kbd { background: var(--green-bg); color: var(--green); border-color: rgba(43, 95, 74, 0.18); }
+  code.env { background: var(--plum-bg); color: var(--plum); border-color: rgba(107, 74, 139, 0.18); }
+  code.cmd:hover { background: var(--accent); color: var(--paper); }
+  code.kbd:hover { background: var(--green); color: var(--paper); }
+  code.env:hover { background: var(--plum); color: var(--paper); }
+
+  .ref {
+    margin: 32px 0 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .ref-head {
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--ink-mute);
+    background: var(--paper-warm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+  }
+  .ref-head .count { color: var(--accent); }
+  .ref table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .ref td { padding: 11px 20px; border-top: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+  .ref tr:first-child td { border-top: none; }
+  .ref tr:hover { background: var(--paper-warm); }
+  .ref td:first-child {
+    width: 40%;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--accent);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ref td.kbd { color: var(--green); }
+  .ref td.env { color: var(--plum); }
+  .ref td:nth-child(2) { color: var(--ink-soft); font-size: 14.5px; }
+
+  .divider {
+    text-align: center;
+    margin: 64px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-dim);
+    letter-spacing: 0.4em;
+  }
+
+  /* ============ MASTER ============ */
+  .master-ref { margin-top: 100px; padding-top: 60px; border-top: 1px solid var(--border); }
+  .master-ref h2 {
+    font-family: 'Spectral', serif;
+    font-weight: 500;
+    font-size: 44px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+  }
+  .master-ref h2 em { font-style: italic; color: var(--accent); }
+  .master-ref .lede { font-size: 16px; color: var(--ink-soft); margin-bottom: 28px; max-width: 620px; }
+  .search-row { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+  .search-input {
+    flex: 1;
+    min-width: 240px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .search-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(181, 61, 43, 0.12);
+  }
+  .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    padding: 7px 13px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    color: var(--ink-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+  .chip:hover { border-color: var(--border-strong); }
+  .chip.active { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+
+  /* ============ SANDBOX FRAME ============ */
+  .sandbox-frame {
+    display: none;
+    position: sticky;
+    top: 64px;
+    align-self: start;
+    height: calc(100vh - 64px);
+    border-left: 1px solid var(--border);
+    background: var(--surface);
+    flex-direction: column;
+  }
+  .shell.sandbox-open .sandbox-frame { display: flex; }
+
+  .sandbox-head { padding: 18px 22px; border-bottom: 1px solid var(--border); background: var(--paper-warm); }
+  .sandbox-head h3 {
+    font-family: 'Spectral', serif;
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .sandbox-head h3::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .sandbox-head .sub { font-size: 12.5px; color: var(--ink-mute); }
+
+  .sandbox-settings { padding: 12px 22px; border-bottom: 1px solid var(--border); background: var(--surface-elev); }
+  .sandbox-settings summary {
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-mute);
+    font-weight: 600;
+    padding: 4px 0;
+    user-select: none;
+  }
+  .sandbox-settings summary:hover { color: var(--ink); }
+  .sandbox-settings .field { margin-top: 10px; }
+  .sandbox-settings label {
+    display: block;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .sandbox-settings input {
+    width: 100%;
+    padding: 9px 11px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .sandbox-settings input:focus { outline: none; border-color: var(--accent); }
+  .sandbox-settings .help { margin-top: 8px; font-size: 11.5px; color: var(--ink-mute); line-height: 1.5; }
+
+  .sandbox-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .sandbox-msg { padding: 12px 14px; border-radius: 6px; font-size: 14px; line-height: 1.55; }
+  .sandbox-msg.user {
+    background: var(--paper-warm);
+    color: var(--ink);
+    align-self: flex-end;
+    max-width: 88%;
+    border: 1px solid var(--border);
+  }
+  .sandbox-msg.bot {
+    background: var(--surface);
+    color: var(--ink);
+    border-left: 2px solid var(--accent);
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    border-radius: 0 6px 6px 0;
+  }
+  .sandbox-msg.bot code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--code-bg);
+    color: var(--accent);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+  .sandbox-msg.bot pre {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 12px;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 8px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .sandbox-msg.bot strong { color: var(--accent); font-weight: 700; }
+  .sandbox-msg.bot em { font-style: italic; color: var(--ink-soft); }
+  .sandbox-msg.bot p { margin-bottom: 8px; }
+  .sandbox-msg.bot p:last-child { margin-bottom: 0; }
+
+  .sandbox-msg.thinking { color: var(--ink-mute); font-style: italic; }
+  .sandbox-msg.thinking::after {
+    content: '';
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-left: 6px;
+    animation: blink 1s infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+  .sandbox-prompts {
+    padding: 10px 22px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    background: var(--surface-elev);
+  }
+  .prompt-chip {
+    padding: 5px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    color: var(--ink-soft);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .prompt-chip:hover { color: var(--accent); border-color: var(--accent); }
+
+  .sandbox-input-row { padding: 14px 22px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; background: var(--surface-elev); }
+  .sandbox-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    padding: 10px 12px;
+    border-radius: 5px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13.5px;
+    resize: none;
+    min-height: 42px;
+    max-height: 110px;
+  }
+  .sandbox-input:focus { outline: none; border-color: var(--accent); }
+  .sandbox-send {
+    background: var(--accent);
+    color: var(--paper);
+    border: none;
+    padding: 0 18px;
+    border-radius: 5px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sandbox-send:hover { background: #9C3525; }
+  .sandbox-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ============ DEMO WINDOW ============ */
+  .demo-window {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 460px;
+    height: 380px;
+    background: #1A1714;
+    border-radius: 10px;
+    box-shadow: var(--shadow-lg);
+    display: none;
+    flex-direction: column;
+    z-index: 60;
+    border: 1px solid #2A2520;
+    overflow: hidden;
+  }
+  .demo-window.open { display: flex; }
+  .demo-window.minimized { height: 44px; width: 220px; }
+  .demo-window.minimized .demo-body,
+  .demo-window.minimized .demo-controls { display: none; }
+  @media (max-width: 560px) {
+    .demo-window { width: calc(100vw - 24px); right: 12px; left: 12px; }
+  }
+
+  .demo-head {
+    padding: 10px 14px;
+    border-bottom: 1px solid #2A2520;
+    background: #15110D;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    cursor: grab;
+    user-select: none;
+  }
+  .demo-head:active { cursor: grabbing; }
+  .demo-head .title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: #E5DCC8;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .demo-head .title::before {
+    content: '';
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    flex-shrink: 0;
+  }
+  .demo-head .scene-label { color: #847B6C; font-weight: 400; }
+  .demo-head .actions { display: flex; gap: 4px; }
+  .demo-head button {
+    background: transparent;
+    border: none;
+    color: #B5AC9A;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 4px 7px;
+    border-radius: 3px;
+    transition: all 0.12s;
+  }
+  .demo-head button:hover { color: #FBF7EE; background: #2A2520; }
+
+  .demo-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: #E5DCC8;
+    background: #1A1714;
+  }
+  .demo-body .demo-line { margin-bottom: 2px; white-space: pre-wrap; word-break: break-word; }
+  .demo-body .demo-cmd { color: #FBE8E0; }
+  .demo-body .demo-cmd::before { content: '➜ '; color: var(--accent-soft); }
+  .demo-body .demo-out { color: #B5AC9A; }
+  .demo-body .demo-system { color: #847B6C; font-style: italic; }
+  .demo-body .demo-success { color: #8FB89C; }
+  .demo-body .demo-cursor::after {
+    content: '▊';
+    color: var(--accent-soft);
+    animation: blink 0.9s infinite;
+  }
+
+  .demo-controls {
+    padding: 8px 12px;
+    background: #15110D;
+    border-top: 1px solid #2A2520;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .demo-controls .scene-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #B5AC9A;
+  }
+  .demo-controls .scene-nav button {
+    background: transparent;
+    border: 1px solid #2A2520;
+    color: #B5AC9A;
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.12s;
+  }
+  .demo-controls .scene-nav button:hover { background: #2A2520; color: #FBF7EE; }
+
+  .demo-controls .playback { display: flex; gap: 4px; }
+  .demo-controls .playback button {
+    background: transparent;
+    border: 1px solid #2A2520;
+    color: #B5AC9A;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: all 0.12s;
+  }
+  .demo-controls .playback button:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--paper);
+  }
+  .demo-controls .playback button.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--paper);
+  }
+
+  /* ============ AUDIO PANEL ============ */
+  .audio-panel {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow-md);
+    display: none;
+    align-items: center;
+    gap: 12px;
+    z-index: 60;
+    max-width: 320px;
+  }
+  .audio-panel.open { display: flex; }
+  .audio-panel .label {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .audio-panel .label strong { color: var(--ink); }
+  .audio-panel button {
+    background: var(--accent);
+    color: var(--paper);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .audio-panel button:hover { background: #9C3525; }
+  .audio-panel button.secondary {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    width: auto;
+    padding: 0 10px;
+    height: 28px;
+    border-radius: 4px;
+    font-size: 11px;
+  }
+  .audio-panel button.secondary:hover { background: var(--paper-warm); color: var(--ink); }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(140%);
+    padding: 11px 22px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    border-radius: 6px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    box-shadow: var(--shadow-lg);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .closing {
+    margin-top: 80px;
+    padding: 48px 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  .closing .mark {
+    font-family: 'Spectral', serif;
+    font-style: italic;
+    font-size: 26px;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .closing p { color: var(--ink-mute); max-width: 460px; margin: 0 auto; font-size: 14px; }
+
+  ::selection { background: var(--accent); color: var(--paper); }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--paper); }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ink-mute); }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<header class="topbar">
+  <div class="topbar-brand">
+    <span class="mark">⌥</span>
+    <div><div class="title">Claude Code Field Guide</div></div>
+    <span class="ver">v2.1.144</span>
+    <span class="mac-badge">macOS</span>
+  </div>
+  <div class="topbar-controls">
+    <button class="ctrl-btn" id="audioBtn" title="Read scene aloud">
+      <span class="dot"></span><span>Listen</span>
+    </button>
+    <button class="ctrl-btn" id="demoBtn" title="Run a demo of each scene">
+      <span class="dot"></span><span>Show Me</span>
+    </button>
+    <button class="ctrl-btn" id="sandboxBtn" title="Open the Q&amp;A sandbox">
+      <span class="dot"></span><span>Sandbox</span>
+    </button>
+  </div>
+</header>
+
+<div class="shell" id="shell">
+
+  <aside class="side-nav">
+    <div class="nav-label">Field Guide · 10 scenes</div>
+    <a href="#hero"><span class="num">00</span>Overview</a>
+    <a href="#scene1"><span class="num">01</span>Onboard to a new repo</a>
+    <a href="#scene2"><span class="num">02</span>Plan a risky refactor</a>
+    <a href="#scene3"><span class="num">03</span>Run features in parallel</a>
+    <a href="#scene4"><span class="num">04</span>Review pull requests</a>
+    <a href="#scene5"><span class="num">05</span>Configure the tool</a>
+    <a href="#scene6"><span class="num">06</span>Write a custom skill</a>
+    <a href="#scene7"><span class="num">07</span>Connect MCP servers</a>
+    <a href="#scene8"><span class="num">08</span>Hooks &amp; scheduled loops</a>
+    <a href="#scene9"><span class="num">09</span>Headless &amp; CI use</a>
+    <a href="#scene10"><span class="num">10</span>Day-to-day commands</a>
+    <a href="#master"><span class="num">⌘</span>Master reference</a>
+  </aside>
+
+  <main>
+
+    <section id="hero" class="hero">
+      <div class="kicker">A practical tour · macOS · v2.1.144 · May 2026</div>
+      <h1>The Claude Code <em>field guide</em>.</h1>
+      <p class="lede">Ten scenarios that walk through almost every command, shortcut, setting, and env var on the cheat sheet. Read it, listen to it, watch a demo of it, ask follow-ups in the sandbox.</p>
+      <div class="quick-tips">
+        <span><strong>Tap any</strong> <code class="cmd">/command</code>, <code class="kbd">⌥ T</code>, or <code class="env">ENV_VAR</code> to copy it.</span>
+        <span><strong>Listen</strong>, <strong>Show Me</strong>, and <strong>Sandbox</strong> toggles live in the top-right.</span>
+      </div>
+    </section>
+
+    <section id="scene1" class="scene" data-audio="scene1">
+      <div class="scene-head">
+        <div class="scene-num">I</div>
+        <div>
+          <div class="scene-time">06:43 · Onboarding</div>
+          <h2 class="scene-title">A repo you've <em>never seen</em></h2>
+        </div>
+      </div>
+      <div class="scene-body">
+        <p>You've inherited a Python data pipeline. You need to understand it fast, not read it line by line.</p>
+
+        <p>Start with <code class="cmd">claude</code> in the project directory, then run <code class="cmd">/init</code>. Claude scans the repository and proposes a <code class="cmd">CLAUDE.md</code> file at the project root. This file becomes a standing brief that loads into every future session. It lives at <code class="cmd">./CLAUDE.md</code> (or <code class="cmd">./.claude/CLAUDE.md</code>) and is committed with the team. Personal notes that you don't want shared go in <code class="cmd">./CLAUDE.local.md</code>, which is automatically gitignored.</p>
+
+        <p>Next, mention specific files using the <code class="cmd">@</code> prefix. Typing <code class="cmd">@src/dispatcher.py</code> with autocomplete pulls that file into context and lets you ask "what calls this and what does it call?" The Explore agent — which runs on Haiku and is read-only — handles this kind of recon quickly and cheaply.</p>
+
+        <p>To see what you've loaded so far, use <code class="cmd">/context</code>. It renders a grid of files, memory entries, and tool definitions currently in your context window, so you can spot waste. When the conversation drifts, <code class="cmd">/compact analyze the ingestion path</code> rewrites it around that focus and drops unrelated content.</p>
+
+        <p class="note">Facts that apply across all your projects — like a style convention you always follow — belong in <code class="cmd">~/.claude/CLAUDE.md</code>. Open it with <code class="cmd">/memory</code>, which also lets you toggle auto-memory and inspect what's currently loaded. Auto-memory lives at <code class="cmd">~/.claude/projects/&lt;proj&gt;/memory/MEMORY.md</code> and auto-loads the first 25 KB or 200 lines at session start. Set <code class="env">CLAUDE_CODE_DISABLE_AUTO_MEMORY</code> to turn it off.</p>
+
+        <div class="ref">
+          <div class="ref-head"><span>Reference · Onboarding</span> <span class="count">12 commands</span></div>
+          <table>
+            <tr><td>claude</td><td>Start an interactive session in the current directory.</td></tr>
+            <tr><td>/init</td><td>Scan the repository and propose a starter CLAUDE.md.</td></tr>
+            <tr><td>./CLAUDE.md</td><td>Project memory — team-shared and committed.</td></tr>
+            <tr><td>./CLAUDE.local.md</td><td>Personal project notes; gitignored automatically.</td></tr>
+            <tr><td>~/.claude/CLAUDE.md</td><td>Your personal memory across every project.</td></tr>
+            <tr><td>/etc/claude-code/CLAUDE.md</td><td>Org-wide managed policy (Linux/WSL fleets).</td></tr>
+            <tr><td>@path/to/file</td><td>File mention with autocomplete; loads file into context.</td></tr>
+            <tr><td>/context</td><td>Grid view of files, memory, and tools currently in context.</td></tr>
+            <tr><td>/compact [focus]</td><td>Rewrite the conversation around a topic.</td></tr>
+            <tr><td>/memory</td><td>Edit CLAUDE.md files; toggle and view auto-memory.</td></tr>
+            <tr><td>MEMORY.md</td><td>Auto-loads first 25 KB or 200 lines at session start.</td></tr>
+            <tr><td class="env">CLAUDE_CODE_DISABLE_AUTO_MEMORY</td><td>Disable auto-memory entirely.</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="scene2" class="scene" data-audio="scene2">
+      <div class="scene-head">
+        <div class="scene-num">II</div>
+        <div>
+          <div class="scene-time">22:48 · Planning a refactor</div>
+          <h2 class="scene-title">Plan first, <em>edit later</em></h2>
+        </div>
+      </div>
+      <div class="scene-body">
+        <p>You're about to touch the auth layer in a React + Node monorepo — sessions, JWT refresh, the whole concern. Before any file gets written, you want a plan.</p>
+
+        <p>Press <code class="kbd">⇧ Tab</code> to cycle permission modes: default → acceptEdits → plan. Stop at plan. In plan mode, Claude can think and propose but can't modify files. You can also start in plan mode directly with <code class="cmd">--permission-mode plan</code>, or jump in from the prompt using <code class="cmd">/plan untangle the JWT refresh race</code>. The plan gets saved as a Markdown file named after your prompt — for example <code class="cmd">fix-auth-race-snug-otter.md</code>.</p>
+
+        <p>For deep work, increase thinking. <code class="kbd">⌥ T</code> toggles extended thinking on. Adding the word <code class="cmd">ultrathink</code> to your prompt maxes effort for that turn. For finer control, <code class="cmd">/effort</code> opens an interactive slider — low, medium, high, xhigh, max. You can also set <code class="env">MAX_THINKING_TOKENS</code> as an env var to cap globally (set to 0 to disable thinking entirely). The <code class="cmd">showThinkingSummaries</code> setting shows thinking inline; it's off by default now.</p>
+
+        <p>When the plan comes back and step 3 looks wrong, you have two options. <code class="cmd">/branch alt-no-redis</code> forks the conversation to pursue an alternative (alias: <code class="cmd">/fork</code>). Or use <code class="kbd">Esc Esc</code> — the rewind gesture, equivalent to <code class="cmd">/rewind</code> or <code class="cmd">/undo</code>. Rewind walks back both the conversation and the code checkpoint.</p>
+
+        <p class="note">Once the plan is right, switch out of plan mode with <code class="kbd">⇧ Tab</code> again to enter <strong>acceptEdits</strong> mode — Claude writes files without prompting, but network calls and dangerous commands still require confirmation. Use <code class="cmd">/diff</code> to inspect pending changes interactively, and <code class="kbd">Ctrl O</code> to toggle the transcript viewer for verbose tool usage. <code class="cmd">/permissions</code> shows recent denials with a Retry button.</p>
+
+        <div class="ref">
+          <div class="ref-head"><span>Reference · Planning</span> <span class="count">16 commands</span></div>
+          <table>
+            <tr><td class="kbd">⇧ Tab</td><td>Cycle permission modes: default → acceptEdits → plan.</td></tr>
+            <tr><td>--permission-mode plan</td><td>Launch directly in plan mode.</td></tr>
+            <tr><td>/plan [description]</td><td>Enter plan mode from the prompt.</td></tr>
+            <tr><td>Plan file naming</td><td>Saved as fix-auth-race-snug-otter.md (prompt + suffix).</td></tr>
+            <tr><td class="kbd">⌥ T</td><td>Toggle extended thinking.</td></tr>
+            <tr><td>"ultrathink"</td><td>Word in your prompt that maxes effort for the turn.</td></tr>
+            <tr><td>/effort</td><td>Interactive slider: low · medium · high · xhigh · max.</td></tr>
+            <tr><td class="env">MAX_THINKING_TOKENS</td><td>Cap thinking tokens; 0 disables thinking.</td></tr>
+            <tr><td>showThinkingSummaries</td><td>Setting: show thinking inline (off by default).</td></tr>
+            <tr><td>/branch [name]</td><td>Fork the conversation (alias: /fork).</td></tr>
+            <tr><td class="kbd">Esc Esc</td><td>Rewind conversation and code checkpoint.</td></tr>
+            <tr><td>/rewind, /undo</td><td>Same rewind from the prompt.</td></tr>
+            <tr><td>/diff</td><td>Interactive diff viewer for pending changes.</td></tr>
+            <tr><td class="kbd">Ctrl O</td><td>Toggle transcript viewer (verbose tool usage).</td></tr>
+            <tr><td>acceptEdits mode</td><td>Auto-accept edits; network calls still confirm.</td></tr>
+            <tr><td>/permissions</td><td>View denied actions; retry from the Recent list.</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="scene3" class="scene" data-audio="scene3">
+      <div class="scene-head">
+        <div class="scene-num">III</div>
+        <div>
+          <div class="scene-time">Sat 09:12 · Parallelism</div>
+          <h2 class="scene-title">Run many features <em>in parallel</em></h2>
+        </div>
+      </div>
+      <div class="scene-body">
+        <p>You have a Saturday and a backlog of eight small refactors, each independent. Serially this takes hours. With git worktrees, it takes minutes.</p>
+
+        <p>A git worktree is a separate checkout of the same repo on a different branch, in a different folder, sharing the same <code class="cmd">.git</code> object store. Claude can edit eight worktrees in parallel without collisions, and you review each as a clean diff.</p>
+
+        <p>Launch a single isolated session with <code class="cmd">--worktree feat-rate-limit</code>. For batch work, <code class="cmd">/batch</code> takes a list of independent tasks and automatically creates worktrees — it scales to 30 parallel agents. Each task runs as a Claude subagent. In agent frontmatter, <code class="cmd">isolation: worktree</code> tells the runtime to give the agent its own checkout, and <code class="cmd">sparsePaths</code> limits which directories get checked out.</p>
+
+        <p>Your status line can show which worktree you're operating on. Set <code class="cmd">workspace.git_worktree</code> in the status line JSON, and pair it with <code class="cmd">refreshInterval</code> to re-run the script every N seconds.</p>
+
+        <p>While agents run, <code class="kbd">Ctrl B</code> backgrounds tasks and <code class="kbd">Ctrl T</code> toggles the task list. To invoke a specific named subagent in the foreground, mention it with <code class="cmd">@agent-name</code>. To resume an agent where it left off, use <code class="cmd">SendMessage</code> (this replaces the older <code class="cmd">resume</code> verb). If two agents go wrong, <code class="kbd">Ctrl X Ctrl K</code> (press twice to confirm) kills all background agents. The worktrees stay on disk for review.</p>
+
+        <p class="note">Agent frontmatter has several useful keys: <code class="cmd">background: true</code> runs in background by default; <code class="cmd">maxTurns</code> caps the agentic loop; <code class="cmd">initialPrompt</code> auto-submits the first turn; <code class="cmd">memory: user|project|local</code> controls which memory the agent reads. <code class="env">CLAUDE_CODE_FORK_SUBAGENT=1</code> enables forked subagents on external builds.</p>
+
+        <div class="ref">
+          <div class="ref-head"><span>Reference · Parallelism</span> <span class="count">14 entries</span></div>
+          <table>
+            <tr><td>/batch</td><td>Auto-create worktrees, run 5–30 parallel agents.</td></tr>
+            <tr><td>--worktree name</td><td>Launch in a named isolated branch worktree.</td></tr>
+            <tr><td>isolation: worktree</td><td>Agent frontmatter — agent gets its own worktree.</td></tr>
+            <tr><td>sparsePaths</td><td>Check out only directories an agent needs.</td></tr>
+            <tr><td>workspace.git_worktree</td><td>Status line JSON key for linked worktree path.</td></tr>
+            <tr><td>refreshInterval</td><td>Re-run custom status line every N seconds.</td></tr>
+            <tr><td class="kbd">Ctrl B</td><td>Background running tasks.</td></tr>
+            <tr><td class="kbd">Ctrl T</td><td>Toggle task list.</td></tr>
+            <tr><td>@agent-name</td><td>Mention a named subagent in the foreground.</td></tr>
+            <tr><td>SendMessage</td><td>Resume an agent (replaces the older "resume" verb).</td></tr>
+            <tr><td>background: true</td><td>Agent frontmatter — runs in background.</td></tr>
+            <tr><td>maxTurns / initialPrompt</td><td>Cap turns; auto-submit first prompt.</td></tr>
+            <tr><td class="kbd">Ctrl X Ctrl K</td><td>Kill all background agents (press twice).</td></tr>
+            <tr><td class="env">CLAUDE_CODE_FORK_SUBAGENT</td><td>Enable forked subagents on external builds.</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="scene4" class="scene" data-audio="scene4">
+      <div class="scene-head">
+        <div class="scene-num">IV</div>
+        <div>
+          <div class="scene-time">14:00 · Code review</div>
+          <h2 class="scene-title">Reviewing <em>pull requests</em></h2>
+        </div>
+      </div>
+      <div class="scene-body">
+        <p>You're on call this week with ten PRs in review. Different PRs need different review approaches.</p>
+
+        <p>For a small PR you want to read carefully, <code class="cmd">/review 4231</code> pulls it locally and lets you discuss it conversationally — ask questions, request refactors, dispute earlier reviewer comments. The diff stays local.</p>
+
+        <p>For a large PR you can't read end to end, <code class="cmd">/ultrareview 4231</code> kicks off a cloud-based review with multiple parallel agents, each scrutinizing a different concern: correctness, security, style, tests. The CLI equivalent for headless use is <code class="cmd">claude ultrareview pr/4231</code>. It accepts a PR number, branch, or path.</p>
+
+        <p>For a dependency bump or anything security-sensitive, <code class="cmd">/security-review</code> scans the diff for vulnerabilities — eval'd input, secret patterns, version pinning issues. It's a triage layer, not a full SAST tool.</p>
+
+        <p>When the PR context lives across platforms, <code class="cmd">--from-pr</code> loads context directly from GitHub, GitLab, Bitbucket, or GitHub Enterprise. Combined with <code class="cmd">claude -p</code> (headless) and JSON output, you can build a review queue.</p>
+
+        <p>If a bug is hard to reproduce, switch from "find the bug" to debugging. <code class="cmd">/debug intermittent 502 from /api/checkout</code> orchestrates a troubleshooting workflow — it asks for the debug log, proposes hypotheses, suggests instrumentation. For debug-level logging of Claude Code itself, use <code class="cmd">--debug</code> with an optional filter.</p>
+
+        <p class="note">Two more reviewing tools: <code class="cmd">/simplify</code> runs three parallel agents that each propose simplifications of a chosen file or function, so you get three opinions in one turn. <code class="cmd">/insights</code> analyzes your sessions report — useful monthly to see what you're actually spending time on.</p>
+
+        <div class="ref">
+          <div class="ref-head"><span>Reference · Review</span> <span class="count">9 commands</span></div>
+          <table>
+            <tr><td>/review [PR]</td><td>Local conversational PR review.</td></tr>
+            <tr><td>/ultrareview [PR#]</td><td>Cloud parallel multi-agent review.</td></tr>
+            <tr><td>claude ultrareview [target]</td><td>Headless review from the CLI.</td></tr>
+            <tr><td>/security-review</td><td>Scan diff for security vulnerabilities.</td></tr>
+            <tr><td>--from-pr</td><td>Load PR context (GitHub / GitLab / Bitbucket / GHE).</td></tr>
+            <tr><td>/debug [description]</td><td>Orchestrated troubleshooting from a debug log.</td></tr>
+            <tr><td>--debug [filter]</td><td>Debug-level logging of Claude Code itself.</td></tr>
+            <tr><td>/simplify</td><td>Three parallel agents propose simplifications.</td></tr>
+            <tr><td>/insights</td><td>Analyze sessions report.</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="scene5" class="scene" data-audio="scene5">
+      <div class="scene-head">
+        <div class="scene-num">V</div>
+        <div>
+          <div class="scene-time">Sun 16:30 · Configuration</div>
+          <h2 class="scene-title">Owning the <em>configuration</em></h2>
+        </div>
+      </div>
+      <div class="scene-body">
+        <p>Settings come in tiers, and each tier overrides the one above it. Knowing where things live is the difference between fluent use and constant frustration.</p>
+
+        <p><code class="cmd">~/.claude/settings.json</code> is your user-level — the defaults you want everywhere. <code class="cmd">.claude/settings.json</code> in a repo is project-shared (committed). <code class="cmd">.claude/settings.local.json</code> is project-local (gitignored). <code class="cmd">~/.claude.json</code> holds OAuth tokens, MCP server lists, and session state — you rarely touch this by hand. <code class="cmd">.mcp.json</code> at the repo root lists MCP servers the team should have. On managed Linux/WSL fleets, IT can drop policy fragments into <code class="cmd">managed-settings.d/</code>.</p>
+
+        <p>Use <code class="cmd">/config key value</code> to write through to user settings without editing JSON by hand. <code class="cmd">/config</code> with no args shows everything in scope.</p>
+
+        <p>Visual settings matter when you spend hours in the tool. <code class="cmd">/theme</code> opens a picker that includes named custom themes and an "Auto (match terminal)" option. <code class="cmd">/color</code> sets just the prompt-bar color — useful for telling sessions apart. <code class="cmd">/keybindings</code> remaps shortcuts (helpful when your terminal already uses <code class="kbd">Ctrl T</code>). <code class="cmd">/scroll-speed</code> adjusts pager scroll. Run <code class="cmd">/terminal-setup</code> once on a new machine to configure terminal-side keybindings — it ensures keys like <code class="kbd">⌥ T</code> actually toggle thinking instead of inserting a literal Greek letter.</p>
+
+        <p class="note">Rules are conditional memory. Put project rules in <code class="cmd">.claude/rules/*.md</code> and personal rules in <code class="cmd">~/.claude/rules/*.md</code>. A <code class="cmd">paths:</code> key in the frontmatter (YAML list of globs) makes a rule load only when matching files are in scope. Inside any CLAUDE.md you can use <code class="cmd">@path/to/file</code> to import — one source of truth composed into different contexts.</p>
+
+        <div class="ref">
+          <div class="ref-head"><span>Reference · Configuration</span> <span class="count">14 entries</span></div>
+          <table>
+            <tr><td>~/.claude/settings.json</td><td>User-level settings — your defaults everywhere.</td></tr>
+            <tr><td>.claude/settings.json</td><td>Project-shared settings; committed with the repo.</td></tr>
+            <tr><td>.claude/settings.local.json</td><td>Project-local settings; gitignored.</td></tr>
+            <tr><td>~/.claude.json</td><td>OAuth tokens, MCP server list, session state.</td></tr>
+            <tr><td>.mcp.json</td><td>Project MCP servers — shared with the team.</td></tr>
+            <tr><td>managed-settings.d/</td><td>Drop-in policy fragments for managed fleets.</td></tr>
+            <tr><td>/config [key [value]]</td><td>Read or write settings; persists to user JSON.</td></tr>
+            <tr><td>/theme [name]</td><td>Theme picker; includes Auto match-terminal.</td></tr>
+            <tr><td>/color [color]</td><td>Set prompt-bar color.</td></tr>
+            <tr><td>/keybindings</td><td>Remap keyboard shortcuts.</td></tr>
+            <tr><td>/scroll-speed</td><td>Adjust pager scroll speed.</td></tr>
+            <tr><td>/terminal-setup</td><td>Configure terminal-side keybindings (run once).</td></tr>
+            <tr><td>.claude/rules/*.md</td><td>Project rules; YAML paths: for conditional loading.</td></tr>
+            <tr><td>@path/to/file</td><td>Import inside CLAUDE.md — single source of truth.</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="scene6" class="scene" data-audio="scene6">
+      <div class="scene-head">
+        <div class="scene-num">VI</div>
+        <div>
+          <div class="scene-time">Wed 11:00 · Custom skills</div>
+          <h2 class="scene-title">Writing a <em>custom skill</em></h2>
+        </div>
+      </div>
+      <div class="scene-body">
+        <p>You realize you've done the same task on three consecutive Wednesdays. The fourth time, you write a skill so Claude can do it for you.</p>
+
+        <p>A skill is a directory: <code class="cmd">.claude/skills/&lt;name&gt;/</code> for project skills, <code class="cmd">~/.claude/skills/&lt;name&gt;/</code> for personal. Inside is a <code class="cmd">SKILL.md</code> file with YAML frontmatter and instructions. The <code class="cmd">description</code> field is critical — it's how Claude decides when to invoke the skill automatically. Write descriptions like trigger conditions: "Use this when the user asks for the weekly error summary."</p>
+
+        <p>Other frontmatter keys control behavior. <code class="cmd">allowed-tools</code> pre-approves tools so the skill doesn't pause for permission prompts. <code class="cmd">model</code> overrides the model — your weekly summary should run on Haiku, not Opus. <code class="cmd">effort</code> overrides effort level. <code class="cmd">paths: [globs]</code> scopes the skill to certain files. <code class="cmd">context: fork</code> runs the skill in a subagent, so its work doesn't pollute the main conversation.</p>
+
+        <p>The body of <code class="cmd">SKILL.md</code> is instructions for Claude. You can interpolate variables: <code class="cmd">$ARGUMENTS</code> is whatever the user typed after the skill name, <code class="cmd">${CLAUDE_SKILL_DIR}</code> is the absolute path to the skill's own directory (useful when shipping helper scripts), and <code class="cmd">${CLAUDE_EFFORT}</code> is the current effort level. The <code class="cmd">!`command`</code> syntax runs a shell command at skill load and injects its stdout into the prompt — for example <code class="cmd">!`date -u`</code> gives Claude the current date.</p>
+
+        <p>If you ship a plugin with binaries (a Bash helper, a Python script), put them in <code class="cmd">plugin bin/</code>. The Bash tool finds them on PATH during the skill run. <code class="cmd">/skills</code> lists available skills. <code class="cmd">/agents</code> lists registered subagents. The built-in Skill tool also discovers built-in slash commands like <code class="cmd">/init</code>, <code class="cmd">/review</code>, and <code class="cmd">/security-review</code>.</p>
+
+        <p class="note">For zero-trust environments where you don't want skills running arbitrary shell commands, set <code class="cmd">disableSkillShellExec</code> in settings to disable the <code class="cmd">!`cmd`</code> injection.</p>
+
+        <div class="ref">
+          <div class="ref-head"><span>Reference · Skills &amp; Agents</span> <span class="count">17 entries</span></div>
+          <table>
+            <tr><td>.claude/skills/&lt;name&gt;/</td><td>Project skill location.</td></tr>
+            <tr><td>~/.claude/skills/&lt;name&gt;/</td><td>Personal skill location.</td></tr>
+            <tr><td>description: (frontmatter)</td><td>Trigger condition for auto-invocation.</td></tr>
+            <tr><td>allowed-tools</td><td>Pre-approved tools — skip permission prompts.</td></tr>
+            <tr><td>model: (frontmatter)</td><td>Override model for this skill.</td></tr>
+            <tr><td>effort: (frontmatter)</td><td>Override effort level.</td></tr>
+            <tr><td>paths: [globs]</td><td>YAML list — scope skill to matching paths.</td></tr>
+            <tr><td>context: fork</td><td>Run skill in a subagent; isolated context.</td></tr>
+            <tr><td>$ARGUMENTS</td><td>User input following the skill invocation.</td></tr>
+            <tr><td>${CLAUDE_SKILL_DIR}</td><td>Absolute path to skill's directory.</td></tr>
+            <tr><td>${CLAUDE_EFFORT}</td><td>Current effort level as a string.</td></tr>
+            <tr><td>!`cmd`</td><td>Shell command — stdout injected into prompt.</td></tr>
+            <tr><td>disableSkillShellExec</td><td>Setting to disable !`cmd` injection.</td></tr>
+            <tr><td>plugin bin/</td><td>Ship executables for the Bash tool.</td></tr>
+            <tr><td>/skills</td><td>List available skills.</td></tr>
+            <tr><td>/agents</td><td>List and manage agent configurations.</td></tr>
+            <tr><td>Skill tool</td><td>Built-in discovery for slash commands.</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="scene7" class="scene" data-audio="scene7">
+      <div class="scene-head">
+        <div class="scene-num">VII</div>
+        <div>
+          <div class="scene-time">Thu 13:30 · MCP</div>
+          <h2 class="scene-title">Connecting <em>MCP servers</em></h2>
+        </div>
+      </div>
+      <div class="scene-body">
+        <p>Claude Code, on its own, sees your filesystem and runs shell commands. To give it access to external systems — Linear, Sentry, internal docs, Postgres — you connect MCP servers. Each MCP server exposes a set of tools that Claude can call.</p>
+
+        <p>Three transports cover the common cases. <code class="cmd">--transport http</code> is the recommended remote transport — your company hosts an MCP server somewhere, and Claude connects to it. <code class="cmd">--transport stdio</code> is for a local process — useful when the server is a binary on your machine. <code class="cmd">--transport sse</code> uses server-sent events and is mostly for legacy remote setups. Use HTTP for new servers.</p>
+
+        <p>Each server is registered in one of three scopes. <strong>Local</strong> is in your <code class="cmd">~/.claude.json</code> and applies only to you. <strong>Project</strong> is in <code class="cmd">.mcp.json</code> at the repo root — committed and shared. <strong>User</strong> is the same file as Local but with a global flag, applying across every project. Pick scope by audience: team-wide goes in project, personal goes in local or user.</p>
+
+        <p>To manage servers interactively, use <code class="cmd">/mcp</code>. To list from the CLI, <code class="cmd">claude mcp list</code>. Once configured, set <code class="cmd">alwaysLoad: true</code> in the server config to keep it connected across all sessions; without it, the server is lazy-loaded on demand.</p>
+
+        <p>Two practical limits to know. Some MCP tools return a lot of text. The default per-tool text threshold is generous, but you can raise it up to 500K characters by setting <code class="cmd">_meta["anthropic/maxResultSizeChars"]</code> in the tool response (or <code class="cmd">maxResultSizeChars</code> on the server). Slow servers can wedge a session — set <code class="env">MCP_TIMEOUT</code> in milliseconds to bound startup time.</p>
+
+        <p class="note">Hooks can call MCP tools directly. A hook step with <code class="cmd">type: "mcp_tool"</code> invokes a server tool without involving Claude's deliberation. Useful for guardrails — for example, automatically running a schema-lint MCP tool against any proposed migration diff.</p>
+
+        <div class="ref">
+          <div class="ref-head"><span>Reference · MCP</span> <span class="count">12 entries</span></div>
+          <table>
+            <tr><td>--transport http</td><td>Recommended remote transport.</td></tr>
+            <tr><td>--transport stdio</td><td>Local process transport.</td></tr>
+            <tr><td>--transport sse</td><td>Server-sent events (mostly legacy).</td></tr>
+            <tr><td>Local scope</td><td>~/.claude.json — applies only to you.</td></tr>
+            <tr><td>Project scope</td><td>.mcp.json — shared and version-controlled.</td></tr>
+            <tr><td>User scope</td><td>~/.claude.json with global flag — all projects.</td></tr>
+            <tr><td>/mcp</td><td>Interactive MCP UI inside Claude Code.</td></tr>
+            <tr><td>claude mcp list</td><td>CLI list of configured servers.</td></tr>
+            <tr><td>alwaysLoad: true</td><td>Keep server connected across sessions.</td></tr>
+            <tr><td>maxResultSizeChars</td><td>Raise per-tool text threshold (up to 500K).</td></tr>
+            <tr><td class="env">MCP_TIMEOUT</td><td>Server startup timeout in milliseconds.</td></tr>
+            <tr><td>type: "mcp_tool" (hook)</td><td>Hook step invokes an MCP tool directly.</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="scene8" class="scene" data-audio="scene8">
+      <div class="scene-head">
+        <div class="scene-num">VIII</div>
+        <div>
+          <div class="scene-time">Fri 09:00 · Automation</div>
+          <h2 class="scene-title">Hooks and <em>scheduled loops</em></h2>
+        </div>
+      </div>
+      <div class="scene-body">
+        <p>Hooks and loops automate different things. Hooks are reactive — when X happens, do Y. Loops are proactive — every N minutes, do Z.</p>
+
+        <p>Manage hooks with <code class="cmd">/hooks</code>. A simple post-edit hook might run <code class="cmd">eslint --fix</code> after Claude writes a <code class="cmd">*.ts</code> file. Conditional hooks are more interesting: the <code class="cmd">if</code> key takes permission-rule syntax, the same DSL used by the permissions system. So a hook can fire only when Claude touches files matching <code class="cmd">production/*.yaml</code>, ask for confirmation, and otherwise block.</p>
+
+        <p>A few hook-config keys matter in production setups. <code class="cmd">continueOnBlock</code> lets the conversation continue even after a hook blocks a tool call, instead of halting entirely. <code class="cmd">hooks: "defer"</code> is for headless runs — pause the session, persist state, resume later when conditions are met. The <code class="cmd">PermissionDenied</code> hook is the specific trigger for when auto-mode classifies an action as denied; you can route those to Slack for human review. <code class="cmd">autoMode.hard_deny</code> lists actions that auto-mode never approves — typical examples include <code class="cmd">rm -rf /</code> or force-pushes to main.</p>
+
+        <p>The Monitor tool streams events from background scripts, so a hook can react to external events — for example, firing a conversation when CI emits a structured deploy-failure event.</p>
+
+        <p>Loops are scheduled tasks. <code class="cmd">/loop 15m check the SRE dashboard and summarize new alerts</code> runs that prompt every 15 minutes. The alias <code class="cmd">/proactive</code> describes it accurately: acting on a schedule, without prompting. Use loops for hourly digests, midnight cleanups, or scheduled reminders.</p>
+
+        <p class="note">Two safety controls. <code class="env">CLAUDE_CODE_DISABLE_CRON</code> halts all scheduled tasks at the next tick — useful before handing your laptop to IT or before a long flight. Every scheduled invocation gets a <code class="env">CLAUDE_CODE_SESSION_ID</code> in its environment, which is your trace handle for correlating logs into observability tools.</p>
+
+        <div class="ref">
+          <div class="ref-head"><span>Reference · Hooks &amp; Loops</span> <span class="count">10 entries</span></div>
+          <table>
+            <tr><td>/hooks</td><td>Manage hooks interactively.</td></tr>
+            <tr><td>hooks: if</td><td>Conditional hooks using permission-rule syntax.</td></tr>
+            <tr><td>continueOnBlock</td><td>Keep running after a blocked tool call.</td></tr>
+            <tr><td>hooks: "defer"</td><td>Headless — pause session, resume on condition.</td></tr>
+            <tr><td>PermissionDenied (hook)</td><td>Triggered on auto-mode denial.</td></tr>
+            <tr><td>autoMode.hard_deny</td><td>Actions auto-mode never approves.</td></tr>
+            <tr><td>Monitor tool</td><td>Stream events from background scripts.</td></tr>
+            <tr><td>/loop [interval] [prompt]</td><td>Recurring scheduled task (alias /proactive).</td></tr>
+            <tr><td class="env">CLAUDE_CODE_DISABLE_CRON</td><td>Disable all scheduled tasks.</td></tr>
+            <tr><td class="env">CLAUDE_CODE_SESSION_ID</td><td>Trace handle for hooks and CI correlation.</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="scene9" class="scene" data-audio="scene9">
+      <div class="scene-head">
+        <div class="scene-num">IX</div>
+        <div>
+          <div class="scene-time">Mon 03:00 · Headless &amp; CI</div>
+          <h2 class="scene-title">Claude as a <em>command-line tool</em></h2>
+        </div>
+      </div>
+      <div class="scene-body">
+        <p>The interactive version of Claude Code has a headless sibling — useful in CI, cron jobs, and any pipeline where you want intelligence without a conversation.</p>
+
+        <p>The basic shape: <code class="cmd">claude -p "summarize today's failed tests"</code>. The <code class="cmd">-p</code> flag means print — Claude runs once, writes its answer to stdout, exits. For machine consumption, use <code class="cmd">--output-format json</code> or <code class="cmd">--output-format stream-json</code>. The streaming variant emits JSON objects line-by-line as Claude produces them, so downstream tools can parse incrementally.</p>
+
+        <p>You can pipe input in: <code class="cmd">cat error.log | claude -p "extract unique stack traces"</code>. This makes Claude a Unix-style filter — you compose it with <code class="cmd">grep</code>, <code class="cmd">jq</code>, and <code class="cmd">xargs</code>.</p>
+
+        <p>Cost discipline matters in unattended runs. <code class="cmd">--max-budget-usd 5</code> halts the run when it hits the ceiling. Pair with <code class="cmd">--effort low</code> for jobs where you want answers without deliberation. The <code class="cmd">/claude-api</code> command loads the API and SDK reference into context so you can write orchestration code with Claude's help.</p>
+
+        <p>The environment variable surface matters in CI. <code class="env">ANTHROPIC_API_KEY</code> is the obvious one. <code class="env">ANTHROPIC_MODEL</code> overrides the default model. <code class="env">ANTHROPIC_BASE_URL</code> redirects to a proxy or gateway — essential when your company routes model traffic through an internal layer. <code class="env">ANTHROPIC_BETAS</code> sends additional beta headers for preview features. <code class="env">ANTHROPIC_CUSTOM_MODEL_OPTION</code> adds a custom entry to the <code class="cmd">/model</code> picker (for example, a fine-tuned model your team maintains).</p>
+
+        <p>Less obvious but useful: <code class="env">API_TIMEOUT_MS</code> defaults to 600,000 (ten minutes) and can be raised. <code class="env">CLAUDECODE=1</code> is set automatically so your shell scripts can detect when they're running inside Claude Code. <code class="env">CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN</code> opts out of the fullscreen renderer if your terminal doesn't handle it well.</p>
+
+        <p class="note">For long-running jobs that hit the same system prompt repeatedly, <code class="env">ENABLE_PROMPT_CACHING_1H</code> opts into the 1-hour prompt cache TTL — a big win. <code class="env">FORCE_PROMPT_CACHING_5M</code> forces the shorter 5-minute TTL. If caching is unexpectedly off, the <code class="env">DISABLE_PROMPT_CACHING*</code> family emits a startup warning. You can also continue a CLI session in the desktop app with <code class="cmd">/desktop</code>, or open a web view with <code class="cmd">--remote</code>.</p>
+
+        <div class="ref">
+          <div class="ref-head"><span>Reference · Headless</span> <span class="count">17 entries</span></div>
+          <table>
+            <tr><td>claude -p "query"</td><td>Non-interactive — run once, print to stdout.</td></tr>
+            <tr><td>--output-format json</td><td>Structured output.</td></tr>
+            <tr><td>--output-format stream-json</td><td>Line-by-line JSON as Claude produces it.</td></tr>
+            <tr><td>--max-budget-usd</td><td>Cost cap; halt when reached.</td></tr>
+            <tr><td>cat file | claude -p</td><td>Pipe stdin — Claude as Unix filter.</td></tr>
+            <tr><td>/claude-api</td><td>Load API + SDK reference into context.</td></tr>
+            <tr><td class="env">ANTHROPIC_API_KEY</td><td>Authentication.</td></tr>
+            <tr><td class="env">ANTHROPIC_MODEL</td><td>Default model override.</td></tr>
+            <tr><td class="env">ANTHROPIC_BASE_URL</td><td>Proxy / gateway override.</td></tr>
+            <tr><td class="env">ANTHROPIC_BETAS</td><td>Additional beta headers.</td></tr>
+            <tr><td class="env">ANTHROPIC_CUSTOM_MODEL_OPTION</td><td>Custom entry in /model picker.</td></tr>
+            <tr><td class="env">API_TIMEOUT_MS</td><td>API timeout; default 600,000 ms.</td></tr>
+            <tr><td class="env">CLAUDECODE</td><td>Set to 1 inside Claude Code shell.</td></tr>
+            <tr><td class="env">CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN</td><td>Opt out of fullscreen rendering.</td></tr>
+            <tr><td class="env">ENABLE_PROMPT_CACHING_1H</td><td>Opt into 1-hour prompt cache TTL.</td></tr>
+            <tr><td>--remote</td><td>Open web session on claude.ai.</td></tr>
+            <tr><td>/desktop</td><td>Continue current session in Desktop app.</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="scene10" class="scene" data-audio="scene10">
+      <div class="scene-head">
+        <div class="scene-num">X</div>
+        <div>
+          <div class="scene-time">Anytime · Day-to-day</div>
+          <h2 class="scene-title">Day-to-day <em>commands</em></h2>
+        </div>
+      </div>
+      <div class="scene-body">
+        <p>Smaller commands and shortcuts you'll use constantly, grouped for reference.</p>
+
+        <p><strong>Recovery.</strong> <code class="kbd">Ctrl C</code> cancels the current input or generation. <code class="kbd">Ctrl D</code> exits the session. <code class="kbd">Ctrl L</code> clears the input and forces a full redraw — fixes a glitched terminal. <code class="kbd">Ctrl U</code> clears the input buffer; <code class="kbd">Ctrl Y</code> restores it. <code class="kbd">Ctrl G</code> opens the current input in your editor (same as <code class="kbd">Ctrl X Ctrl E</code>) — useful for multi-paragraph prompts. <code class="kbd">Ctrl R</code> reverse-searches prompt history.</p>
+
+        <p><strong>Composition.</strong> <code class="kbd">\ Enter</code> inserts a newline without sending. For Vim users, <code class="kbd">v</code> enters visual-character mode and <code class="kbd">V</code> enters visual-line mode inside the prompt.</p>
+
+        <p><strong>Prefixes.</strong> <code class="cmd">/</code> is a slash command, <code class="cmd">!</code> runs a direct bash command without involving Claude, and <code class="cmd">@</code> mentions a file with autocomplete. Typing <code class="cmd">!git status</code> is faster than asking Claude to run it.</p>
+
+        <p><strong>Session navigation.</strong> <code class="cmd">/clear</code> wipes the conversation. <code class="cmd">/copy 3</code> copies the third-to-last response. <code class="cmd">/recap</code> summarizes the session when you return to it. <code class="cmd">/export</code> dumps the conversation to disk. <code class="cmd">/resume "memory-leak-investigation"</code> reopens a named session. <code class="cmd">/rename</code> renames the current one. <code class="cmd">/focus</code> toggles a focus view inside fullscreen. <code class="cmd">/goal write the migration script and validate it</code> sets a completion goal — Claude continues until met, with a live progress overlay.</p>
+
+        <p><strong>Side questions.</strong> <code class="cmd">/btw what does grep -P mean?</code> asks a question without adding to the main conversation. The answer doesn't consume your context budget.</p>
+
+        <p><strong>Model and effort.</strong> <code class="kbd">⌥ P</code> switches model in place; <code class="kbd">⌥ O</code> toggles fast mode (lower latency, lower depth); <code class="cmd">/fast on</code> is the explicit form; <code class="cmd">/model</code> opens the picker, with left and right arrows adjusting effort inside the picker. For multiple models, set <code class="cmd">modelOverrides</code> in settings to map picker labels to custom IDs.</p>
+
+        <p><strong>Usage and limits.</strong> <code class="cmd">/usage</code> shows token usage, cost, and cache breakdown (it replaces the older <code class="cmd">/cost</code> and <code class="cmd">/stats</code>). <code class="cmd">/extra-usage</code> appears when you're rate-limited. The 1M context window is available on Opus 4.6 (Max, Team, and Enterprise plans); <code class="env">CLAUDE_CODE_DISABLE_1M_CONTEXT</code> opts out per machine.</p>
+
+        <p><strong>Voice.</strong> <code class="cmd">/voice</code> toggles push-to-talk dictation. Hold <code class="kbd">Space</code> to record, release to send. Twenty languages are supported.</p>
+
+        <p><strong>Diagnostics.</strong> <code class="cmd">/doctor</code> diagnoses your installation. <code class="cmd">/insights</code> analyzes your sessions report. <code class="cmd">/help</code> lists everything. <code class="cmd">/feedback</code> (alias <code class="cmd">/bug</code>) sends a report.</p>
+
+        <p><strong>Housekeeping.</strong> <code class="cmd">claude update</code> pulls the latest version. <code class="cmd">claude plugin prune</code> removes unused plugins. <code class="cmd">claude project purge ./old-repo</code> deletes all Claude Code state for a path. <code class="cmd">claude auth login</code> handles sign-in, with <code class="cmd">--sso</code> and <code class="cmd">--console</code> variants. <code class="env">DISABLE_UPDATES</code> blocks all update paths. <code class="env">CLAUDE_CODE_PACKAGE_MANAGER_AUTO_UPDATE</code> enables auto-upgrade via Homebrew or WinGet.</p>
+
+        <div class="ref">
+          <div class="ref-head"><span>Reference · Day-to-day</span> <span class="count">28 entries</span></div>
+          <table>
+            <tr><td class="kbd">Ctrl C / D</td><td>Cancel input/gen; exit session.</td></tr>
+            <tr><td class="kbd">Ctrl L</td><td>Clear input + force redraw.</td></tr>
+            <tr><td class="kbd">Ctrl U / Y</td><td>Clear / restore input buffer.</td></tr>
+            <tr><td class="kbd">Ctrl G</td><td>Open input in editor.</td></tr>
+            <tr><td class="kbd">Ctrl R</td><td>Reverse-search prompt history.</td></tr>
+            <tr><td class="kbd">\ Enter</td><td>Newline without sending.</td></tr>
+            <tr><td class="kbd">v / V</td><td>Vim visual-char / visual-line modes.</td></tr>
+            <tr><td>! prefix</td><td>Direct bash, no Claude involvement.</td></tr>
+            <tr><td>/clear</td><td>Wipe conversation.</td></tr>
+            <tr><td>/copy [N]</td><td>Copy last (or Nth) response.</td></tr>
+            <tr><td>/recap</td><td>Summarize session when returning.</td></tr>
+            <tr><td>/export</td><td>Export conversation to disk.</td></tr>
+            <tr><td>/resume [session]</td><td>Resume by ID or name.</td></tr>
+            <tr><td>/rename [name]</td><td>Rename current session.</td></tr>
+            <tr><td>/focus</td><td>Toggle focus view (fullscreen only).</td></tr>
+            <tr><td>/goal [desc]</td><td>Set completion goal; live progress overlay.</td></tr>
+            <tr><td>/btw &lt;question&gt;</td><td>Side question, doesn't add to context.</td></tr>
+            <tr><td class="kbd">⌥ P / ⌥ O</td><td>Switch model / toggle fast mode.</td></tr>
+            <tr><td>/fast [on|off]</td><td>Explicit fast-mode toggle.</td></tr>
+            <tr><td>modelOverrides</td><td>Map picker labels to custom model IDs.</td></tr>
+            <tr><td>/usage</td><td>Token usage, cost, cache breakdown.</td></tr>
+            <tr><td>/extra-usage</td><td>Path forward when rate-limited.</td></tr>
+            <tr><td>/voice</td><td>Push-to-talk dictation, 20 languages.</td></tr>
+            <tr><td>/doctor</td><td>Diagnose installation.</td></tr>
+            <tr><td>/insights</td><td>Analyze sessions report.</td></tr>
+            <tr><td>/feedback (/bug)</td><td>Submit feedback.</td></tr>
+            <tr><td>claude plugin prune</td><td>Remove unused / orphaned plugins.</td></tr>
+            <tr><td>claude project purge [path]</td><td>Delete all project state for a path.</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider">· · ·</div>
+
+    <section id="master" class="master-ref">
+      <h2>The <em>master</em> reference</h2>
+      <p class="lede">Everything else, searchable and filterable. Type to narrow; tap any row to copy.</p>
+
+      <div class="search-row">
+        <input type="text" class="search-input" id="masterSearch" placeholder="Search — /command, ⌥ shortcut, ENV_VAR…">
+        <div class="filter-chips" id="filterChips">
+          <span class="chip active" data-filter="all">All</span>
+          <span class="chip" data-filter="cmd">Slash</span>
+          <span class="chip" data-filter="kbd">Keys</span>
+          <span class="chip" data-filter="cli">CLI/Flags</span>
+          <span class="chip" data-filter="env">Env</span>
+          <span class="chip" data-filter="setting">Settings</span>
+        </div>
+      </div>
+
+      <div class="ref">
+        <div class="ref-head"><span>All entries</span> <span class="count" id="masterCount">—</span></div>
+        <table id="masterTableBody"></table>
+      </div>
+    </section>
+
+    <div class="closing">
+      <div class="mark">end of guide.</div>
+      <p>Bookmark this page. Open the Sandbox when a command surprises you. Use Listen on a walk. Use Show Me when you want to see, not read.</p>
+    </div>
+
+  </main>
+
+  <aside class="sandbox-frame" id="sandboxFrame">
+    <div class="sandbox-head">
+      <h3>Live Sandbox</h3>
+      <div class="sub">Ask anything about Claude Code. Calls the API directly.</div>
+    </div>
+
+    <details class="sandbox-settings">
+      <summary>API settings</summary>
+      <div class="field">
+        <label for="apiKeyInput">Anthropic API key (optional here)</label>
+        <input type="password" id="apiKeyInput" placeholder="sk-ant-…" autocomplete="off">
+        <div class="help">Inside Claude.ai, credentials are handled automatically — leave this blank. Paste a key only if you've saved this page locally and are running it standalone.</div>
+      </div>
+    </details>
+
+    <div class="sandbox-messages" id="sandboxMessages">
+      <div class="sandbox-msg bot">
+        <p>Ask anything about the commands, settings, or env vars in this guide. I'll keep answers short and concrete. Try a chip below or type your own.</p>
+      </div>
+    </div>
+
+    <div class="sandbox-prompts">
+      <div class="prompt-chip" data-prompt="When should I use /ultrareview vs /review?">/ultrareview vs /review</div>
+      <div class="prompt-chip" data-prompt="Walk me through writing a custom skill for a weekly Sentry digest.">Weekly Sentry skill</div>
+      <div class="prompt-chip" data-prompt="How do I cap costs in headless mode for a CI job?">Cost cap in CI</div>
+      <div class="prompt-chip" data-prompt="Difference between /loop and a regular cron job?">/loop vs cron</div>
+    </div>
+
+    <div class="sandbox-input-row">
+      <textarea class="sandbox-input" id="sandboxInput" placeholder="Ask about any command or scenario…" rows="1"></textarea>
+      <button class="sandbox-send" id="sandboxSend">Send</button>
+    </div>
+  </aside>
+
+</div>
+
+<div class="demo-window" id="demoWindow">
+  <div class="demo-head" id="demoHead">
+    <div class="title">
+      <span>Show Me</span>
+      <span class="scene-label" id="demoSceneLabel">Scene 1 · Onboarding</span>
+    </div>
+    <div class="actions">
+      <button id="demoMinBtn" title="Minimize">—</button>
+      <button id="demoCloseBtn" title="Close">✕</button>
+    </div>
+  </div>
+  <div class="demo-body" id="demoBody"></div>
+  <div class="demo-controls">
+    <div class="scene-nav">
+      <button id="demoPrev" title="Previous scene">◂</button>
+      <span id="demoSceneNum">1/10</span>
+      <button id="demoNext" title="Next scene">▸</button>
+    </div>
+    <div class="playback">
+      <button id="demoPlay" class="primary">Play</button>
+      <button id="demoRestart">Restart</button>
+    </div>
+  </div>
+</div>
+
+<div class="audio-panel" id="audioPanel">
+  <div class="label">Reading <strong id="audioSceneLabel">scene 1</strong></div>
+  <button id="audioPlayPause" title="Pause/Resume">⏸</button>
+  <button id="audioStopBtn" class="secondary">Stop</button>
+</div>
+
+<div class="toast" id="toast">Copied</div>
+
+<script>
+const MASTER_DATA = [
+  { type: 'kbd', name: 'Ctrl C', desc: 'Cancel input/generation.' },
+  { type: 'kbd', name: 'Ctrl D', desc: 'Exit session.' },
+  { type: 'kbd', name: 'Ctrl L', desc: 'Clear prompt input + force full screen redraw.' },
+  { type: 'kbd', name: 'Ctrl O', desc: 'Toggle transcript viewer; cycles focus view in fullscreen.' },
+  { type: 'kbd', name: 'Ctrl U', desc: 'Clear entire input buffer.' },
+  { type: 'kbd', name: 'Ctrl Y', desc: 'Restore cleared input buffer.' },
+  { type: 'kbd', name: 'Ctrl G', desc: 'Open input in editor (same as Ctrl+X Ctrl+E).' },
+  { type: 'kbd', name: 'Ctrl R', desc: 'Reverse search history.' },
+  { type: 'kbd', name: 'Ctrl X Ctrl K', desc: 'Kill all background agents (press twice).' },
+  { type: 'kbd', name: 'Ctrl B', desc: 'Background running tasks.' },
+  { type: 'kbd', name: 'Ctrl T', desc: 'Toggle task list.' },
+  { type: 'kbd', name: 'Esc Esc', desc: 'Rewind or summarize.' },
+  { type: 'kbd', name: '⇧ Tab', desc: 'Cycle permission modes: default → acceptEdits → plan.' },
+  { type: 'kbd', name: '⌥ P', desc: 'Switch model (macOS).' },
+  { type: 'kbd', name: '⌥ T', desc: 'Toggle extended thinking (macOS).' },
+  { type: 'kbd', name: '⌥ O', desc: 'Toggle fast mode (macOS).' },
+  { type: 'kbd', name: '\\ Enter', desc: 'Newline.' },
+  { type: 'kbd', name: 'v / V', desc: 'Vim visual / visual-line modes inside prompt.' },
+  { type: 'cmd', name: '/clear', desc: 'Clear conversation.' },
+  { type: 'cmd', name: '/compact [focus]', desc: 'Compact context with optional focus.' },
+  { type: 'cmd', name: '/branch [name]', desc: 'Branch conversation (alias /fork).' },
+  { type: 'cmd', name: '/usage', desc: 'Token usage, cost, cache breakdown (replaces /cost & /stats).' },
+  { type: 'cmd', name: '/context', desc: 'Visualize context as a grid.' },
+  { type: 'cmd', name: '/diff', desc: 'Interactive diff viewer.' },
+  { type: 'cmd', name: '/copy [N]', desc: 'Copy last (or Nth) response.' },
+  { type: 'cmd', name: '/recap', desc: 'Summarize session context when returning.' },
+  { type: 'cmd', name: '/undo, /rewind', desc: 'Rewind conversation and code checkpoint.' },
+  { type: 'cmd', name: '/export', desc: 'Export conversation.' },
+  { type: 'cmd', name: '/plan [desc]', desc: 'Enter plan mode directly from prompt.' },
+  { type: 'cmd', name: '/resume [session]', desc: 'Resume by ID or name.' },
+  { type: 'cmd', name: '/focus', desc: 'Toggle focus view (fullscreen only).' },
+  { type: 'cmd', name: '/goal [desc]', desc: 'Set completion goal; live progress overlay.' },
+  { type: 'cmd', name: '/config [key [value]]', desc: 'View/set settings; persists to ~/.claude/settings.json.' },
+  { type: 'cmd', name: '/model [model]', desc: 'Switch model; arrow keys adjust effort.' },
+  { type: 'cmd', name: '/fast [on|off]', desc: 'Toggle fast mode.' },
+  { type: 'cmd', name: '/theme [name]', desc: 'Custom themes; Auto matches terminal.' },
+  { type: 'cmd', name: '/permissions', desc: 'View/update permissions.' },
+  { type: 'cmd', name: '/effort [level]', desc: 'Set effort low/medium/high/xhigh/max.' },
+  { type: 'cmd', name: '/color [color]', desc: 'Set prompt-bar color.' },
+  { type: 'cmd', name: '/keybindings', desc: 'Customize keyboard shortcuts.' },
+  { type: 'cmd', name: '/scroll-speed', desc: 'Adjust output scroll speed.' },
+  { type: 'cmd', name: '/terminal-setup', desc: 'Configure terminal keybindings.' },
+  { type: 'cmd', name: '/init', desc: 'Create starter CLAUDE.md.' },
+  { type: 'cmd', name: '/memory', desc: 'Edit CLAUDE.md, toggle auto-memory, view entries.' },
+  { type: 'cmd', name: '/mcp', desc: 'Manage MCP servers.' },
+  { type: 'cmd', name: '/hooks', desc: 'Manage hooks.' },
+  { type: 'cmd', name: '/skills', desc: 'List available skills.' },
+  { type: 'cmd', name: '/agents', desc: 'Manage agent configurations.' },
+  { type: 'cmd', name: '/review [PR]', desc: 'Local PR review.' },
+  { type: 'cmd', name: '/ultrareview [PR#]', desc: 'Cloud parallel multi-agent code review.' },
+  { type: 'cmd', name: '/security-review', desc: 'Scan diff for security vulnerabilities.' },
+  { type: 'cmd', name: '/loop [interval] [prompt]', desc: 'Recurring task (alias /proactive).' },
+  { type: 'cmd', name: '/ide', desc: 'IDE integrations status.' },
+  { type: 'cmd', name: '/add-dir <path>', desc: 'Add working directory.' },
+  { type: 'cmd', name: '/simplify', desc: 'Three parallel agents propose simplifications.' },
+  { type: 'cmd', name: '/batch', desc: 'Large parallel changes (5–30 worktrees).' },
+  { type: 'cmd', name: '/debug [desc]', desc: 'Troubleshoot from debug log.' },
+  { type: 'cmd', name: '/claude-api', desc: 'Load API + SDK reference into context.' },
+  { type: 'cmd', name: '/btw <question>', desc: 'Side question — no context cost.' },
+  { type: 'cmd', name: '/extra-usage', desc: 'Path forward when rate-limited.' },
+  { type: 'cmd', name: '/voice', desc: 'Toggle push-to-talk voice dictation.' },
+  { type: 'cmd', name: '/doctor', desc: 'Diagnose installation.' },
+  { type: 'cmd', name: '/insights', desc: 'Analyze sessions report.' },
+  { type: 'cmd', name: '/desktop', desc: 'Continue current session in Desktop app.' },
+  { type: 'cmd', name: '/rename [name]', desc: 'Rename current session.' },
+  { type: 'cmd', name: '/help', desc: 'Show help and commands.' },
+  { type: 'cmd', name: '/feedback, /bug', desc: 'Submit feedback to Anthropic.' },
+  { type: 'cli', name: 'claude', desc: 'Start interactive session.' },
+  { type: 'cli', name: 'claude "query"', desc: 'Interactive session with initial prompt.' },
+  { type: 'cli', name: 'claude -p "query"', desc: 'Headless / SDK — run once, print to stdout.' },
+  { type: 'cli', name: 'claude -c', desc: 'Continue last conversation.' },
+  { type: 'cli', name: 'claude -r "name"', desc: 'Resume by ID or name.' },
+  { type: 'cli', name: 'claude update', desc: 'Update to latest version.' },
+  { type: 'cli', name: 'claude auth login', desc: 'Sign in (--sso, --console flags).' },
+  { type: 'cli', name: 'claude agents', desc: 'List agents.' },
+  { type: 'cli', name: 'claude mcp list', desc: 'List MCP servers.' },
+  { type: 'cli', name: 'claude plugin', desc: 'Plugin management.' },
+  { type: 'cli', name: 'claude plugin prune', desc: 'Remove unused/orphaned plugins.' },
+  { type: 'cli', name: 'claude project purge [path]', desc: 'Delete all Claude Code project state.' },
+  { type: 'cli', name: 'claude ultrareview [target]', desc: 'Non-interactive code review.' },
+  { type: 'cli', name: '--model', desc: 'Set model on launch.' },
+  { type: 'cli', name: '-n, --name', desc: 'Session name.' },
+  { type: 'cli', name: '--resume, -r', desc: 'Resume a session.' },
+  { type: 'cli', name: '--continue, -c', desc: 'Continue most recent session.' },
+  { type: 'cli', name: '--add-dir', desc: 'Add working directory.' },
+  { type: 'cli', name: '--agent', desc: 'Use a specific agent.' },
+  { type: 'cli', name: '--allowedTools', desc: 'Pre-approve tools at launch.' },
+  { type: 'cli', name: '--disallowedTools', desc: 'Remove tools from availability.' },
+  { type: 'cli', name: '--allow-danger…', desc: 'Add bypassPermissions to ⇧Tab cycle.' },
+  { type: 'cli', name: '--output-format', desc: 'text / json / stream-json.' },
+  { type: 'cli', name: '--max-budget-usd', desc: 'Cost cap.' },
+  { type: 'cli', name: '--remote', desc: 'Open web session on claude.ai.' },
+  { type: 'cli', name: '--effort', desc: 'low/medium/high/xhigh/max.' },
+  { type: 'cli', name: '--permission-mode', desc: 'default/acceptEdits/plan/auto/dontAsk/bypassPermissions.' },
+  { type: 'cli', name: '--dangerously-skip-permissions', desc: '⚠ Skip all prompts.' },
+  { type: 'cli', name: '--debug [filter]', desc: 'Debug logging.' },
+  { type: 'cli', name: '--settings <file>', desc: 'Load settings JSON.' },
+  { type: 'cli', name: '--from-pr', desc: 'Load PR context (GitHub/GitLab/Bitbucket/GHE).' },
+  { type: 'cli', name: '--worktree name', desc: 'Launch in isolated branch worktree.' },
+  { type: 'cli', name: '--transport http|stdio|sse', desc: 'MCP transport on add.' },
+  { type: 'env', name: 'ANTHROPIC_API_KEY', desc: 'Authentication.' },
+  { type: 'env', name: 'ANTHROPIC_MODEL', desc: 'Default model override.' },
+  { type: 'env', name: 'ANTHROPIC_BASE_URL', desc: 'Proxy / gateway override.' },
+  { type: 'env', name: 'ANTHROPIC_BETAS', desc: 'Additional beta headers.' },
+  { type: 'env', name: 'ANTHROPIC_CUSTOM_MODEL_OPTION', desc: 'Add a custom entry to /model picker.' },
+  { type: 'env', name: 'MAX_THINKING_TOKENS', desc: 'Cap thinking tokens; 0 = off.' },
+  { type: 'env', name: 'ENABLE_PROMPT_CACHING_1H', desc: 'Opt into 1-hour prompt cache TTL.' },
+  { type: 'env', name: 'FORCE_PROMPT_CACHING_5M', desc: 'Force 5-minute prompt cache TTL.' },
+  { type: 'env', name: 'CLAUDE_CODE_ENABLE_AWAY_SUMMARY', desc: 'Force recap when telemetry disabled.' },
+  { type: 'env', name: 'CLAUDECODE', desc: 'Set to 1 inside Claude Code shell.' },
+  { type: 'env', name: 'CLAUDE_CODE_DISABLE_CRON', desc: 'Disable scheduled tasks.' },
+  { type: 'env', name: 'CLAUDE_CODE_FORK_SUBAGENT', desc: 'Enable forked subagents on external builds.' },
+  { type: 'env', name: 'DISABLE_UPDATES', desc: 'Block all update paths.' },
+  { type: 'env', name: 'API_TIMEOUT_MS', desc: 'API timeout; default 600,000 ms.' },
+  { type: 'env', name: 'MCP_TIMEOUT', desc: 'MCP server startup timeout (ms).' },
+  { type: 'env', name: 'CLAUDE_CODE_SESSION_ID', desc: 'Unique session ID for hooks and CI tracing.' },
+  { type: 'env', name: 'CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN', desc: 'Opt out of fullscreen rendering.' },
+  { type: 'env', name: 'CLAUDE_CODE_DISABLE_AUTO_MEMORY', desc: 'Disable auto-memory.' },
+  { type: 'env', name: 'CLAUDE_CODE_DISABLE_1M_CONTEXT', desc: 'Disable 1M context window.' },
+  { type: 'env', name: 'CLAUDE_CODE_PACKAGE_MANAGER_AUTO_UPDATE', desc: 'Auto-upgrade via Homebrew / WinGet.' },
+  { type: 'setting', name: 'modelOverrides', desc: 'Map /model picker entries to custom IDs.' },
+  { type: 'setting', name: 'autoMode.hard_deny', desc: 'Unconditional auto-mode classifier deny rules.' },
+  { type: 'setting', name: 'hooks: if', desc: 'Conditional hooks using permission-rule syntax.' },
+  { type: 'setting', name: 'hooks: "defer"', desc: 'Pause headless → resume later.' },
+  { type: 'setting', name: 'continueOnBlock', desc: 'Keep running after a blocked tool call.' },
+  { type: 'setting', name: 'PermissionDenied (hook)', desc: 'Triggered on auto-mode denial.' },
+  { type: 'setting', name: 'type: "mcp_tool"', desc: 'Hook step invokes an MCP tool directly.' },
+  { type: 'setting', name: 'Monitor tool', desc: 'Stream events from background scripts.' },
+  { type: 'setting', name: 'disableSkillShellExec', desc: 'Block !`cmd` injection in skills.' },
+  { type: 'setting', name: 'refreshInterval', desc: 'Re-run custom status line every N seconds.' },
+  { type: 'setting', name: 'showThinkingSummaries', desc: 'Show thinking inline (off by default).' },
+  { type: 'setting', name: 'alwaysLoad: true', desc: 'MCP server config — keep connected.' },
+  { type: 'setting', name: 'maxResultSizeChars', desc: 'Raise per-tool text threshold (up to 500K).' },
+  { type: 'setting', name: 'sparsePaths', desc: 'Check out only directories an agent needs.' },
+  { type: 'setting', name: 'isolation: worktree', desc: 'Agent frontmatter — runs in own worktree.' },
+  { type: 'setting', name: 'background: true', desc: 'Agent frontmatter — runs in background.' },
+  { type: 'setting', name: 'maxTurns', desc: 'Agent frontmatter — limit agentic turns.' },
+  { type: 'setting', name: 'initialPrompt', desc: 'Agent frontmatter — auto-submit first turn.' },
+  { type: 'setting', name: 'permissionMode (agent)', desc: 'default/acceptEdits/plan/dontAsk/bypassPermissions.' },
+  { type: 'setting', name: 'paths: (skill)', desc: 'YAML list of globs — scope skill to matching paths.' },
+  { type: 'setting', name: 'context: fork', desc: 'Skill runs in a subagent; isolated context.' },
+  { type: 'setting', name: 'plugin bin/', desc: 'Ship executables for the Bash tool.' },
+];
+
+const DEMO_SCRIPTS = [
+  { label: 'Scene 1 · Onboarding', sceneId: 'scene1', steps: [
+    { type: 'cmd', text: 'cd ~/projects/legacy-pipeline && claude' },
+    { type: 'system', text: 'Claude Code v2.1.144 · Sonnet 4.6 · context 0/200K' },
+    { type: 'cmd', text: '/init' },
+    { type: 'success', text: '✓ scanning repository (Python · FastAPI · SQLAlchemy)' },
+    { type: 'success', text: '✓ proposed ./CLAUDE.md  (12 sections, 1.4 KB)' },
+    { type: 'cmd', text: '@src/dispatcher.py what calls this and what does it call?' },
+    { type: 'system', text: '[Explore · Haiku · read-only]' },
+    { type: 'out', text: 'called by:  api/routes/events.py:42, workers/consumer.py:18' },
+    { type: 'out', text: 'calls:      services/notify.py, services/audit.py, db/repo.py' },
+    { type: 'cmd', text: '/context' },
+    { type: 'out', text: '────── context 18.4K / 200K (9%) ──────' },
+    { type: 'out', text: 'CLAUDE.md         1.4K   dispatcher.py    11.2K' },
+    { type: 'out', text: 'memory/topics     2.8K   tool defs         3.0K' },
+  ]},
+  { label: 'Scene 2 · Planning a refactor', sceneId: 'scene2', steps: [
+    { type: 'cmd', text: 'claude --permission-mode plan' },
+    { type: 'system', text: '⬢ plan mode · file edits blocked' },
+    { type: 'cmd', text: 'ultrathink the JWT refresh race in auth/' },
+    { type: 'system', text: '✻ thinking · effort max · 14.2s' },
+    { type: 'success', text: '✓ plan written: fix-auth-race-snug-otter.md' },
+    { type: 'out', text: '  1. add mutex around token refresh' },
+    { type: 'out', text: '  2. cache refreshed tokens for 5s' },
+    { type: 'out', text: '  3. concurrency tests in jwt_test.ts' },
+    { type: 'out', text: '  4. migration for in-flight sessions' },
+    { type: 'cmd', text: '⇧ Tab  → acceptEdits mode' },
+    { type: 'system', text: '◉ acceptEdits · files auto-written · network confirms' },
+    { type: 'cmd', text: '/diff' },
+    { type: 'out', text: 'auth/refresh.ts  +24 −9' },
+    { type: 'out', text: 'auth/__tests__/jwt.test.ts  +47 −0' },
+  ]},
+  { label: 'Scene 3 · Parallelism', sceneId: 'scene3', steps: [
+    { type: 'cmd', text: '/batch' },
+    { type: 'system', text: 'paste tasks (one per line), end with EOF:' },
+    { type: 'out', text: 'fix rate-limit headers' },
+    { type: 'out', text: 'migrate logger to pino' },
+    { type: 'out', text: 'add OpenAPI tags' },
+    { type: 'out', text: 'EOF' },
+    { type: 'success', text: '✓ 3 worktrees created · 3 agents spawned' },
+    { type: 'cmd', text: 'Ctrl+B   → background' },
+    { type: 'cmd', text: 'Ctrl+T   → toggle tasks' },
+    { type: 'out', text: '⠋ agent#1 rate-limit     working   2m12s' },
+    { type: 'out', text: '⠙ agent#2 pino migration working   1m48s' },
+    { type: 'out', text: '✓ agent#3 openapi tags   done       45s' },
+    { type: 'cmd', text: '@agent-1 push your branch when tests pass' },
+  ]},
+  { label: 'Scene 4 · PR review', sceneId: 'scene4', steps: [
+    { type: 'cmd', text: '/ultrareview 4231' },
+    { type: 'system', text: 'spinning up parallel reviewers · cloud' },
+    { type: 'out', text: '⠋ correctness · ⠙ security · ⠹ style · ⠸ tests' },
+    { type: 'success', text: '✓ review complete · 7 findings' },
+    { type: 'out', text: '  🔒 security: unsanitized header in middleware/cors.ts:34' },
+    { type: 'out', text: '  ⚙ correctness: race on sessions map · auth/session.ts:118' },
+    { type: 'out', text: '  ✎ style: 12 lint warnings · tests/*' },
+    { type: 'cmd', text: '/security-review' },
+    { type: 'success', text: '✓ diff scanned · 1 issue worth attention' },
+    { type: 'out', text: '  package.json: lodash 4.17.20 → 4.17.21 (CVE-2021-23337)' },
+  ]},
+  { label: 'Scene 5 · Configuration', sceneId: 'scene5', steps: [
+    { type: 'cmd', text: '/config' },
+    { type: 'out', text: 'theme: auto · color: #B53D2B · effort: medium' },
+    { type: 'out', text: 'showThinkingSummaries: false · 1M context: on' },
+    { type: 'cmd', text: '/theme' },
+    { type: 'system', text: '↑↓ to choose · enter to apply' },
+    { type: 'out', text: '  ✓ Auto (match terminal)' },
+    { type: 'out', text: '    Paper · Solar · Phosphor · Mono Dark' },
+    { type: 'cmd', text: '/color forest' },
+    { type: 'success', text: '✓ prompt bar now #2B5F4A' },
+    { type: 'cmd', text: 'cat ~/.claude/CLAUDE.md' },
+    { type: 'out', text: '# Personal memory' },
+    { type: 'out', text: '- prefer pnpm over npm' },
+    { type: 'out', text: '- SQL through repository pattern, not raw' },
+  ]},
+  { label: 'Scene 6 · Custom skills', sceneId: 'scene6', steps: [
+    { type: 'cmd', text: 'mkdir -p ~/.claude/skills/sentry-digest && cd $_' },
+    { type: 'cmd', text: 'cat > SKILL.md <<EOF' },
+    { type: 'out', text: '---' },
+    { type: 'out', text: 'description: Weekly Sentry error digest. Trigger on' },
+    { type: 'out', text: '  "weekly errors" or "sentry digest" prompts.' },
+    { type: 'out', text: 'model: claude-haiku-4-5' },
+    { type: 'out', text: 'allowed-tools: [Bash, WebFetch]' },
+    { type: 'out', text: '---' },
+    { type: 'out', text: 'Fetch issues from past 7d. Group by service.' },
+    { type: 'out', text: 'Current date: !`date -u +%Y-%m-%d`' },
+    { type: 'out', text: 'EOF' },
+    { type: 'cmd', text: '/skills' },
+    { type: 'success', text: '✓ sentry-digest (personal · haiku-4-5)' },
+  ]},
+  { label: 'Scene 7 · MCP', sceneId: 'scene7', steps: [
+    { type: 'cmd', text: 'claude mcp add linear --transport http \\' },
+    { type: 'cmd', text: '  --url https://mcp.linear.app --scope project' },
+    { type: 'success', text: '✓ linear server registered in .mcp.json' },
+    { type: 'cmd', text: '/mcp' },
+    { type: 'out', text: '┌── connected servers ──────────────────┐' },
+    { type: 'out', text: '│ ● linear     http       12 tools       │' },
+    { type: 'out', text: '│ ● postgres   stdio       4 tools       │' },
+    { type: 'out', text: '│ ○ sentry     sse         not loaded    │' },
+    { type: 'out', text: '└───────────────────────────────────────┘' },
+    { type: 'cmd', text: 'list my open Linear issues for the iam project' },
+    { type: 'system', text: '[mcp · linear · list_issues]' },
+    { type: 'out', text: 'IAM-104  fix Okta SAML loop          high' },
+    { type: 'out', text: 'IAM-118  refresh-token race in JWT   med' },
+  ]},
+  { label: 'Scene 8 · Hooks & loops', sceneId: 'scene8', steps: [
+    { type: 'cmd', text: '/hooks' },
+    { type: 'system', text: 'editing ~/.claude/settings.json · hooks block' },
+    { type: 'out', text: '{ "after_edit": {' },
+    { type: 'out', text: '    "if": "path matches **/*.ts",' },
+    { type: 'out', text: '    "run": "pnpm eslint --fix $FILE",' },
+    { type: 'out', text: '    "continueOnBlock": true } }' },
+    { type: 'success', text: '✓ hook saved' },
+    { type: 'cmd', text: '/loop 15m check sre dashboard, summarize new alerts' },
+    { type: 'success', text: '✓ scheduled · session_id=loop_8f3b21' },
+    { type: 'system', text: '15:00 ⏱ tick · 2 new alerts (api-gw, billing-worker)' },
+    { type: 'out', text: 'api-gw     p95 latency 1.2s → 3.4s · 14:42 UTC' },
+    { type: 'out', text: 'billing    error rate 0.2% → 1.8% · 14:49 UTC' },
+  ]},
+  { label: 'Scene 9 · Headless', sceneId: 'scene9', steps: [
+    { type: 'cmd', text: 'cat ci-failures.log | claude -p \\' },
+    { type: 'cmd', text: '  "group by service, list unique errors" \\' },
+    { type: 'cmd', text: '  --output-format json --max-budget-usd 0.50' },
+    { type: 'system', text: '⠋ running headless · effort medium · budget $0.50' },
+    { type: 'out', text: '{' },
+    { type: 'out', text: '  "groups": [' },
+    { type: 'out', text: '    { "service": "api-gw", "errors": [' },
+    { type: 'out', text: '      "ECONNRESET on upstream",' },
+    { type: 'out', text: '      "EHOSTUNREACH redis-primary" ] },' },
+    { type: 'out', text: '    { "service": "billing", "errors": [' },
+    { type: 'out', text: '      "race in invoice numbering" ] }' },
+    { type: 'out', text: '  ],' },
+    { type: 'out', text: '  "cost_usd": 0.12, "tokens": 4280' },
+    { type: 'out', text: '}' },
+  ]},
+  { label: 'Scene 10 · Day-to-day', sceneId: 'scene10', steps: [
+    { type: 'cmd', text: '/btw what does grep -P actually do?' },
+    { type: 'system', text: '[side question · not added to main context]' },
+    { type: 'out', text: 'Perl-compatible regex mode in GNU grep.' },
+    { type: 'out', text: 'Lets you use lookaround, \\d, etc.' },
+    { type: 'cmd', text: '/usage' },
+    { type: 'out', text: 'session    tokens   cost     cache hit' },
+    { type: 'out', text: 'this       18,402   $0.27    62%' },
+    { type: 'out', text: 'today     142,890   $1.84    71%' },
+    { type: 'cmd', text: '/goal write a migration to add user_settings table' },
+    { type: 'system', text: '◐ goal set · live progress overlay enabled' },
+    { type: 'out', text: '  ✓ schema sketched' },
+    { type: 'out', text: '  ⠋ migration file' },
+    { type: 'out', text: '  ⏵ rollback path' },
+    { type: 'cmd', text: '/copy 1' },
+    { type: 'success', text: '✓ last response copied to clipboard' },
+  ]},
+];
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+const toast = document.getElementById('toast');
+let toastTimer;
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+}
+
+const masterTable = document.getElementById('masterTableBody');
+const masterCount = document.getElementById('masterCount');
+const searchInput = document.getElementById('masterSearch');
+let activeFilter = 'all';
+
+function renderMaster() {
+  const q = searchInput.value.toLowerCase().trim();
+  const items = MASTER_DATA.filter(item => {
+    if (activeFilter !== 'all' && item.type !== activeFilter) return false;
+    if (!q) return true;
+    return (item.name + ' ' + item.desc).toLowerCase().includes(q);
+  });
+  masterTable.innerHTML = items.map(item => `
+    <tr data-copy="${escapeHtml(item.name)}">
+      <td class="${item.type === 'kbd' ? 'kbd' : item.type === 'env' ? 'env' : ''}">${escapeHtml(item.name)}</td>
+      <td>${escapeHtml(item.desc)}</td>
+    </tr>`).join('');
+  masterCount.textContent = `${items.length} ${items.length === 1 ? 'entry' : 'entries'}`;
+}
+
+searchInput.addEventListener('input', renderMaster);
+document.querySelectorAll('#filterChips .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#filterChips .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeFilter = chip.dataset.filter;
+    renderMaster();
+  });
+});
+renderMaster();
+
+document.addEventListener('click', e => {
+  if (e.target.matches('code.cmd, code.kbd, code.env')) {
+    navigator.clipboard.writeText(e.target.textContent).then(() => showToast(`Copied: ${e.target.textContent}`));
+    return;
+  }
+  const row = e.target.closest('#masterTableBody tr');
+  if (row && row.dataset.copy) {
+    navigator.clipboard.writeText(row.dataset.copy).then(() => showToast(`Copied: ${row.dataset.copy}`));
+  }
+});
+
+const progressBar = document.getElementById('progressBar');
+const navLinks = document.querySelectorAll('.side-nav a');
+const sectionIds = ['hero', 'scene1', 'scene2', 'scene3', 'scene4', 'scene5', 'scene6', 'scene7', 'scene8', 'scene9', 'scene10', 'master'];
+
+function onScroll() {
+  const h = document.documentElement;
+  progressBar.style.width = ((h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100) + '%';
+
+  const y = window.scrollY + 160;
+  let current = sectionIds[0];
+  for (const id of sectionIds) {
+    const el = document.getElementById(id);
+    if (el && el.offsetTop <= y) current = id;
+  }
+  navLinks.forEach(link => link.classList.toggle('active', link.getAttribute('href') === '#' + current));
+
+  if (demoAutoFollow && current.startsWith('scene')) {
+    const idx = parseInt(current.replace('scene', ''), 10) - 1;
+    if (idx !== currentDemoIdx && !demoIsPlaying && demoWindow.classList.contains('open')) {
+      loadDemoScene(idx, false);
+    }
+  }
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+
+const shell = document.getElementById('shell');
+const sandboxBtn = document.getElementById('sandboxBtn');
+const demoBtn = document.getElementById('demoBtn');
+const audioBtn = document.getElementById('audioBtn');
+
+sandboxBtn.addEventListener('click', () => {
+  const isOpen = shell.classList.toggle('sandbox-open');
+  sandboxBtn.classList.toggle('active', isOpen);
+});
+
+demoBtn.addEventListener('click', () => {
+  const isOpen = demoWindow.classList.toggle('open');
+  demoWindow.classList.remove('minimized');
+  demoBtn.classList.toggle('active', isOpen);
+  if (isOpen && !demoStarted) {
+    loadDemoScene(currentDemoIdx, false);
+    demoStarted = true;
+  }
+});
+
+audioBtn.addEventListener('click', () => {
+  if (audioState === 'idle' || audioState === 'stopped') {
+    startAudioForCurrentScene();
+  } else {
+    stopAudio();
+  }
+});
+
+const sandboxMessages = document.getElementById('sandboxMessages');
+const sandboxInput = document.getElementById('sandboxInput');
+const sandboxSend = document.getElementById('sandboxSend');
+const apiKeyInput = document.getElementById('apiKeyInput');
+const promptChips = document.querySelectorAll('.prompt-chip');
+
+const conversationHistory = [];
+
+function appendSandboxMsg(role, content, thinking = false) {
+  const msg = document.createElement('div');
+  msg.className = `sandbox-msg ${role}${thinking ? ' thinking' : ''}`;
+  if (role === 'bot') msg.innerHTML = renderBotMarkdown(content);
+  else msg.textContent = content;
+  sandboxMessages.appendChild(msg);
+  sandboxMessages.scrollTop = sandboxMessages.scrollHeight;
+  return msg;
+}
+
+function renderBotMarkdown(text) {
+  let html = escapeHtml(text);
+  html = html.replace(/```([\s\S]*?)```/g, (_, code) => `<pre>${code.trim()}</pre>`);
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '<em>$1</em>');
+  html = html.split(/\n\n+/).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+  return html;
+}
+
+promptChips.forEach(chip => {
+  chip.addEventListener('click', () => {
+    sandboxInput.value = chip.dataset.prompt;
+    sendSandbox();
+  });
+});
+
+sandboxInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendSandbox();
+  }
+});
+
+sandboxInput.addEventListener('input', () => {
+  sandboxInput.style.height = 'auto';
+  sandboxInput.style.height = Math.min(sandboxInput.scrollHeight, 110) + 'px';
+});
+
+sandboxSend.addEventListener('click', sendSandbox);
+
+async function sendSandbox() {
+  const text = sandboxInput.value.trim();
+  if (!text) return;
+  sandboxInput.value = '';
+  sandboxInput.style.height = 'auto';
+  appendSandboxMsg('user', text);
+  conversationHistory.push({ role: 'user', content: text });
+
+  const thinkingMsg = appendSandboxMsg('bot', 'Thinking', true);
+  sandboxSend.disabled = true;
+
+  const systemPrompt = `You are a Claude Code expert helping a user read "The Claude Code Field Guide" — an interactive tutorial covering ten scenarios on macOS (onboarding, planning, parallelism, PR review, configuration, custom skills, MCP, hooks/loops, headless/CI, day-to-day commands). The user has Pro plan access and API keys. Answer briefly — usually 2 short paragraphs. Use \`backticks\` for any command, flag, setting, or env var. Use **bold** for the key concept. Mention specific commands by name. Refer to Claude Code v2.1.144 (May 2026). The user is on macOS so use ⌥ keys freely. Do not repeat the question. Do not pad with disclaimers.`;
+
+  try {
+    const apiKey = apiKeyInput.value.trim();
+    const headers = { "Content-Type": "application/json" };
+    if (apiKey) {
+      headers["x-api-key"] = apiKey;
+      headers["anthropic-version"] = "2023-06-01";
+      headers["anthropic-dangerous-direct-browser-access"] = "true";
+    }
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: conversationHistory,
+      }),
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(`API ${response.status}: ${err.slice(0, 200)}`);
+    }
+
+    const data = await response.json();
+    const reply = (data.content || []).map(b => b.type === 'text' ? b.text : '').filter(Boolean).join('\n');
+
+    thinkingMsg.classList.remove('thinking');
+    thinkingMsg.innerHTML = renderBotMarkdown(reply);
+    conversationHistory.push({ role: 'assistant', content: reply });
+  } catch (err) {
+    thinkingMsg.classList.remove('thinking');
+    thinkingMsg.innerHTML = renderBotMarkdown(`*Couldn't reach the API. ${err.message}*\n\nIf you're hosting this outside Claude.ai, paste your Anthropic API key in **API settings** above.`);
+  } finally {
+    sandboxSend.disabled = false;
+    sandboxInput.focus();
+  }
+}
+
+const demoWindow = document.getElementById('demoWindow');
+const demoBody = document.getElementById('demoBody');
+const demoSceneLabel = document.getElementById('demoSceneLabel');
+const demoSceneNum = document.getElementById('demoSceneNum');
+const demoPlay = document.getElementById('demoPlay');
+const demoRestart = document.getElementById('demoRestart');
+const demoPrev = document.getElementById('demoPrev');
+const demoNext = document.getElementById('demoNext');
+const demoMinBtn = document.getElementById('demoMinBtn');
+const demoCloseBtn = document.getElementById('demoCloseBtn');
+const demoHead = document.getElementById('demoHead');
+
+let currentDemoIdx = 0;
+let demoStepIdx = 0;
+let demoTimer = null;
+let demoIsPlaying = false;
+let demoStarted = false;
+let demoAutoFollow = true;
+let typingTimer = null;
+
+function loadDemoScene(idx, autoplay) {
+  stopDemo();
+  currentDemoIdx = idx;
+  demoStepIdx = 0;
+  const script = DEMO_SCRIPTS[idx];
+  demoSceneLabel.textContent = script.label;
+  demoSceneNum.textContent = `${idx + 1}/${DEMO_SCRIPTS.length}`;
+  demoBody.innerHTML = '';
+  if (autoplay) playDemo();
+}
+
+function appendDemoLine(step, cb) {
+  const line = document.createElement('div');
+  line.className = `demo-line demo-${step.type}`;
+  demoBody.appendChild(line);
+
+  if (step.type === 'cmd') {
+    let i = 0;
+    line.classList.add('demo-cursor');
+    typingTimer = setInterval(() => {
+      if (i >= step.text.length) {
+        clearInterval(typingTimer);
+        line.classList.remove('demo-cursor');
+        if (cb) cb();
+        return;
+      }
+      line.textContent = step.text.slice(0, ++i);
+      demoBody.scrollTop = demoBody.scrollHeight;
+    }, 24);
+  } else {
+    line.textContent = step.text;
+    demoBody.scrollTop = demoBody.scrollHeight;
+    if (cb) setTimeout(cb, step.type === 'system' ? 350 : 220);
+  }
+}
+
+function playDemo() {
+  demoIsPlaying = true;
+  demoPlay.textContent = 'Pause';
+  scrollToSceneIfNeeded();
+  runStep();
+}
+
+function runStep() {
+  if (!demoIsPlaying) return;
+  const script = DEMO_SCRIPTS[currentDemoIdx];
+  if (demoStepIdx >= script.steps.length) {
+    demoIsPlaying = false;
+    demoPlay.textContent = 'Replay';
+    return;
+  }
+  const step = script.steps[demoStepIdx++];
+  appendDemoLine(step, () => {
+    demoTimer = setTimeout(runStep, step.type === 'cmd' ? 320 : 160);
+  });
+}
+
+function stopDemo() {
+  demoIsPlaying = false;
+  if (demoTimer) clearTimeout(demoTimer);
+  if (typingTimer) clearInterval(typingTimer);
+  demoPlay.textContent = 'Play';
+}
+
+function scrollToSceneIfNeeded() {
+  const sceneId = DEMO_SCRIPTS[currentDemoIdx].sceneId;
+  const sceneEl = document.getElementById(sceneId);
+  if (!sceneEl) return;
+  const rect = sceneEl.getBoundingClientRect();
+  if (rect.top < 80 || rect.top > window.innerHeight - 200) {
+    demoAutoFollow = false;
+    sceneEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => { demoAutoFollow = true; }, 1200);
+  }
+}
+
+demoPlay.addEventListener('click', () => {
+  if (demoIsPlaying) {
+    stopDemo();
+  } else {
+    const script = DEMO_SCRIPTS[currentDemoIdx];
+    if (demoStepIdx >= script.steps.length) {
+      demoStepIdx = 0;
+      demoBody.innerHTML = '';
+    }
+    playDemo();
+  }
+});
+
+demoRestart.addEventListener('click', () => {
+  stopDemo();
+  demoStepIdx = 0;
+  demoBody.innerHTML = '';
+  playDemo();
+});
+
+demoPrev.addEventListener('click', () => {
+  const next = (currentDemoIdx - 1 + DEMO_SCRIPTS.length) % DEMO_SCRIPTS.length;
+  loadDemoScene(next, false);
+  scrollToSceneIfNeeded();
+});
+demoNext.addEventListener('click', () => {
+  const next = (currentDemoIdx + 1) % DEMO_SCRIPTS.length;
+  loadDemoScene(next, false);
+  scrollToSceneIfNeeded();
+});
+
+demoMinBtn.addEventListener('click', () => demoWindow.classList.toggle('minimized'));
+demoCloseBtn.addEventListener('click', () => {
+  demoWindow.classList.remove('open');
+  demoBtn.classList.remove('active');
+  stopDemo();
+});
+
+let dragOff = null;
+demoHead.addEventListener('mousedown', e => {
+  if (e.target.tagName === 'BUTTON') return;
+  const rect = demoWindow.getBoundingClientRect();
+  dragOff = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  document.body.style.userSelect = 'none';
+});
+document.addEventListener('mousemove', e => {
+  if (!dragOff) return;
+  const left = Math.max(8, Math.min(window.innerWidth - 100, e.clientX - dragOff.x));
+  const top = Math.max(8, Math.min(window.innerHeight - 60, e.clientY - dragOff.y));
+  demoWindow.style.left = left + 'px';
+  demoWindow.style.top = top + 'px';
+  demoWindow.style.right = 'auto';
+  demoWindow.style.bottom = 'auto';
+});
+document.addEventListener('mouseup', () => {
+  dragOff = null;
+  document.body.style.userSelect = '';
+});
+
+const audioPanel = document.getElementById('audioPanel');
+const audioSceneLabel = document.getElementById('audioSceneLabel');
+const audioPlayPause = document.getElementById('audioPlayPause');
+const audioStopBtn = document.getElementById('audioStopBtn');
+
+let audioState = 'idle';
+let currentUtterance = null;
+
+function getVisibleSceneId() {
+  const y = window.scrollY + window.innerHeight / 3;
+  let current = 'scene1';
+  for (const id of sectionIds) {
+    if (!id.startsWith('scene')) continue;
+    const el = document.getElementById(id);
+    if (el && el.offsetTop <= y) current = id;
+  }
+  return current;
+}
+
+function getSceneText(sceneId) {
+  const el = document.getElementById(sceneId);
+  if (!el) return '';
+  const parts = [];
+  const title = el.querySelector('.scene-title');
+  if (title) parts.push(title.textContent.replace(/\s+/g, ' '));
+  el.querySelectorAll('.scene-body > p').forEach(p => {
+    parts.push(p.textContent.replace(/\s+/g, ' '));
+  });
+  return parts.join('. ');
+}
+
+function startAudioForCurrentScene() {
+  if (!('speechSynthesis' in window)) {
+    showToast('Browser does not support speech');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const sceneId = getVisibleSceneId();
+  const text = getSceneText(sceneId);
+  if (!text) {
+    showToast('Nothing to read here');
+    return;
+  }
+  const sceneNum = sceneId.replace('scene', '');
+  audioSceneLabel.textContent = `scene ${sceneNum}`;
+  audioPanel.classList.add('open');
+  audioBtn.classList.add('active');
+
+  currentUtterance = new SpeechSynthesisUtterance(text);
+  currentUtterance.rate = 1.0;
+  currentUtterance.pitch = 1.0;
+  currentUtterance.onend = () => {
+    audioState = 'stopped';
+    audioPanel.classList.remove('open');
+    audioBtn.classList.remove('active');
+  };
+  currentUtterance.onerror = () => {
+    audioState = 'stopped';
+    audioPanel.classList.remove('open');
+    audioBtn.classList.remove('active');
+  };
+  audioState = 'playing';
+  audioPlayPause.textContent = '⏸';
+  window.speechSynthesis.speak(currentUtterance);
+}
+
+audioPlayPause.addEventListener('click', () => {
+  if (audioState === 'playing') {
+    window.speechSynthesis.pause();
+    audioState = 'paused';
+    audioPlayPause.textContent = '▶';
+  } else if (audioState === 'paused') {
+    window.speechSynthesis.resume();
+    audioState = 'playing';
+    audioPlayPause.textContent = '⏸';
+  }
+});
+
+function stopAudio() {
+  window.speechSynthesis.cancel();
+  audioState = 'stopped';
+  audioPanel.classList.remove('open');
+  audioBtn.classList.remove('active');
+}
+
+audioStopBtn.addEventListener('click', stopAudio);
+
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && document.activeElement === document.body) {
+    e.preventDefault();
+    searchInput.focus();
+    searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+});
+</script>
+</body>
+</html>
