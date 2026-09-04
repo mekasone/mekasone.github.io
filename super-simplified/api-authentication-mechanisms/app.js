@@ -131,7 +131,7 @@ const authData = [
     }
 
     function updateMoon(index) {
-      const angle = 30 + (index * ((150 - 30) / (authData.length - 1)));
+      const angle = 55 + (index * ((125 - 55) / (authData.length - 1)));
       const rotationFromVertical = angle - 90;
 
       moonOrbit.style.transform = `rotate(${rotationFromVertical}deg)`;
