@@ -100,10 +100,10 @@
       overflow: visible;
     }
 
-    /* Rotates from 30 deg to 150 deg */
+    /* A shallower 55-to-125-degree arc keeps the moon above the detail panel */
     .moon-orbit-anchor {
       position: absolute;
-      bottom: -320px;
+      bottom: -135px;
       left: 50%;
       width: 2px;
       height: 2px;
