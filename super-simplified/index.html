@@ -1,13 +1,225 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Super Simplified — Mekasone</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Super Simplified: Foundation, Frontier, Fine-Tuning and Inference</title>
+<meta name="description" content="The four stages of modern AI, explained through everyday analogies and mapped to software engineering terms.">
 <style>
-:root{--paper:#f7f4ee;--ink:#25221d;--muted:#756f65;--line:#ded8cd;--rose:#bd4560;--gold:#d58b2b;--green:#48735e;--panel:#fffdf8}*{box-sizing:border-box;margin:0;padding:0}body{background:var(--paper);color:var(--ink);font:16px/1.65 'DM Sans',system-ui,sans-serif}.wrap{width:min(900px,calc(100% - 40px));margin:0 auto}.top{display:flex;justify-content:space-between;align-items:center;padding:22px 0;border-bottom:1px solid var(--line);font-size:12px;letter-spacing:.12em;text-transform:uppercase}.top a{text-decoration:none;color:var(--muted)}.top .mark{color:var(--rose);font-weight:700}.hero{padding:78px 0 56px;border-bottom:1px solid var(--line)}.eyebrow{color:var(--rose);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}.hero h1{margin-top:13px;font:500 clamp(2.8rem,8vw,5.8rem)/.98 Fraunces,serif;letter-spacing:-.045em}.hero p:not(.eyebrow){max-width:620px;margin-top:22px;color:var(--muted);font-size:18px;line-height:1.55}.section{padding:44px 0;border-bottom:1px solid var(--line)}.section h2{font:500 1.8rem/1.15 Fraunces,serif}.section>p{max-width:650px;margin-top:10px;color:var(--muted)}.topic-list{display:grid;gap:0;margin-top:27px}.topic{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:18px;align-items:center;padding:22px 0;border-top:1px solid var(--line);text-decoration:none}.topic:last-child{border-bottom:1px solid var(--line)}.topic-dot{width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 5px #d58b2b1c}.topic:nth-child(1) .topic-dot{background:var(--rose);box-shadow:0 0 0 5px #bd45601c}.topic:nth-child(3) .topic-dot{background:var(--green);box-shadow:0 0 0 5px #48735e1c}.topic h3{font:500 1.45rem/1.15 Fraunces,serif}.topic p{margin-top:5px;color:var(--muted);font-size:14px;line-height:1.45}.topic .arrow{color:var(--muted);font-size:18px;transition:color .16s,transform .16s}.topic:hover h3,.topic:hover .arrow{color:var(--rose)}.topic:hover .arrow{transform:translateX(3px)}.note{padding:18px 0;color:var(--muted);font-size:13px}.footer{padding:28px 0 56px;color:var(--muted);font-size:13px}.footer a{color:var(--ink)}@media(max-width:620px){.wrap{width:min(100% - 28px,900px)}.hero{padding:54px 0 42px}.topic{grid-template-columns:10px minmax(0,1fr) auto;gap:13px}.topic h3{font-size:1.25rem}}
+:root{--ink:#1d2433;--muted:#5b6475;--bg:#faf8f4;--card:#fff;--line:#e5e0d6;--a:#1f5f8b;--b:#7a3e9d;--c:#b4570f;--d:#1d7a4f}
+*{box-sizing:border-box}
+body{margin:0;font:17px/1.65 Georgia,"Times New Roman",serif;color:var(--ink);background:var(--bg)}
+header{padding:56px 20px 36px;max-width:960px;margin:0 auto}
+h1{font-size:2.3rem;line-height:1.15;margin:0 0 10px}
+h2{font-size:1.5rem;margin:0 0 12px}
+h3{font:600 1.05rem system-ui,sans-serif;margin:0 0 6px}
+.sub{color:var(--muted);font-size:1.1rem;margin:0}
+main{max-width:960px;margin:0 auto;padding:0 20px 80px}
+section{margin:44px 0}
+nav{font:14px system-ui,sans-serif;margin-top:18px;display:flex;flex-wrap:wrap;gap:8px}
+nav a{padding:6px 12px;border:1px solid var(--line);border-radius:99px;color:var(--ink);text-decoration:none;background:#fff}
+nav a:hover{border-color:var(--a)}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.stage{background:var(--card);border:1px solid var(--line);border-top:5px solid var(--a);border-radius:10px;padding:16px}
+.stage p{margin:6px 0 0;font-size:.97rem}
+.s2{border-top-color:var(--b)}.s3{border-top-color:var(--c)}.s4{border-top-color:var(--d)}
+.tag{font:700 12px system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:.95rem}
+th,td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font:600 .9rem system-ui,sans-serif;background:#f3efe6}
+td:first-child{font:600 .9rem system-ui,sans-serif;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.callout{background:#eef4f8;border-left:5px solid var(--a);padding:14px 18px;border-radius:6px}
+.analogy{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:16px 0}
+.analogy h3{font-size:1.15rem}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:10px}
+.row div{font-size:.95rem;padding:10px 12px;border-radius:8px;background:#faf8f4;border-top:3px solid var(--a)}
+.row div:nth-child(2){border-top-color:var(--b)}.row div:nth-child(3){border-top-color:var(--c)}.row div:nth-child(4){border-top-color:var(--d)}
+.row b{display:block;font:700 12px system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:10px 0}
+summary{font:600 1rem system-ui,sans-serif;cursor:pointer}
+dl{margin:0}dt{font:600 1rem system-ui,sans-serif;margin-top:14px}dd{margin:2px 0 0}
+dd em{color:var(--muted)}
+.mini{font-size:.9rem;color:var(--muted)}
+footer{max-width:960px;margin:0 auto;padding:0 20px 50px;color:var(--muted);font:14px system-ui,sans-serif}
 </style>
 </head>
-<body><div class="wrap"><header class="top"><a href="/">← Mekasone / Published Work</a><span class="mark">Super Simplified</span></header><main><section class="hero"><p class="eyebrow">A small index of big ideas</p><h1>Super<br><em>Simplified.</em></h1><p>A growing collection of plain-language explanations for technical concepts—the kind you can carry into a conversation, a design review, or the next thing you build.</p></section><section class="section"><h2>Choose a topic.</h2><p>Each page keeps the core idea intact, then removes the unnecessary ceremony.</p><div class="topic-list"><a class="topic" href="/super-simplified/ai-ed/"><span class="topic-dot" aria-hidden="true"></span><div><h3>AI'ed <span style="color:var(--muted)">(AI things)</span></h3><p>Models, agents, skills, harnesses, and MCP in one readable mental model.</p></div><span class="arrow">↗</span></a><a class="topic" href="/super-simplified/llm-model-runtime-map/"><span class="topic-dot" aria-hidden="true"></span><div><h3>LLM Model &amp; Runtime Map</h3><p>Foundation and frontier models, fine-tuning, RAG, context, agents, and inference—without forcing them into one straight pipeline.</p></div><span class="arrow">↗</span></a><a class="topic" href="/super-simplified/api-authentication-mechanisms/"><span class="topic-dot" aria-hidden="true"></span><div><h3>API Authentication Mechanisms</h3><p>API keys, tokens, certificates, cookies, SAML, WebAuthn, and OIDC—explained through technical purpose and practical analogies.</p></div><span class="arrow">↗</span></a></div><p class="note">More topics will join this index as they earn a simpler explanation.</p></section></main><footer class="footer"><a href="/">Return to the main collection ↗</a></footer></div></body></html>
+<body>
+<header>
+  <h1>Super Simplified: Foundation, Frontier, Fine-Tuning and Inference</h1>
+  <p class="sub">The four stages of modern AI, explained through everyday things, then mapped to the software terms engineers already know.</p>
+  <nav>
+    <a href="#big-picture">The big picture</a>
+    <a href="#compare">Side by side</a>
+    <a href="#analogies">12 analogies</a>
+    <a href="#engineer">For software engineers</a>
+    <a href="#glossary">Glossary</a>
+  </nav>
+</header>
+<main>
+
+<section id="big-picture">
+  <h2>The big picture</h2>
+  <p>Every AI model you use goes through the same life. First someone builds a general model from scratch. A few labs push that model as far as it can go. Companies then adapt it to a specific job. Finally, people use it, one question at a time. Those four steps have names:</p>
+  <div class="grid4">
+    <div class="stage"><span class="tag">Step 1</span><h3>Foundation model</h3><p>The broad, general-purpose base, trained on a huge slice of the world's text, code and images.</p></div>
+    <div class="stage s2"><span class="tag">Step 2</span><h3>Frontier model</h3><p>The most capable foundation models available today, built at the edge of what is possible.</p></div>
+    <div class="stage s3"><span class="tag">Step 3</span><h3>Fine-tuning</h3><p>Taking an existing model and teaching it one specific skill or domain.</p></div>
+    <div class="stage s4"><span class="tag">Step 4</span><h3>Inference</h3><p>Using the finished model to answer a question or make a prediction, live.</p></div>
+  </div>
+  <p class="callout" style="margin-top:18px"><b>In one sentence:</b> building a generic framework (foundation), a very sophisticated version of it (frontier), targeted solutions on top of it (fine-tuning), and using one of those solutions (inference).</p>
+  <p class="mini">A note on "frontier": it is a moving label, not a different technology. A frontier model is simply a foundation model at the leading edge of capability, so today's frontier model becomes tomorrow's ordinary one.</p>
+</section>
+
+<section id="compare">
+  <h2>Side by side</h2>
+  <div class="scroll"><table>
+    <thead><tr><th></th><th>Foundation</th><th>Frontier</th><th>Fine-tuning</th><th>Inference</th></tr></thead>
+    <tbody>
+    <tr><td>Primary goal</td><td>Build a broad, general-purpose AI base from scratch.</td><td>Push the limits of AI capability, safety and scale.</td><td>Adapt an existing model's knowledge to a specific task.</td><td>Use a deployed model to get answers or predictions.</td></tr>
+    <tr><td>What happens</td><td>Massive training: building a model from a blank slate.</td><td>Cutting-edge training: new scale and new architectures.</td><td>Updating: changing an existing model's parameters.</td><td>Executing: running data through a frozen model.</td></tr>
+    <tr><td>Data used</td><td>Billions of public web pages, books and code repositories.</td><td>Elite, curated data plus massive public and synthetic datasets.</td><td>Smaller, specialized datasets, such as one company's data.</td><td>Live user prompts, queries or raw input data.</td></tr>
+    <tr><td>Cost</td><td>Extreme: millions of dollars in cloud compute and infrastructure.</td><td>Astronomical: hundreds of millions to billions in R&amp;D and GPUs.</td><td>Moderate to high: a fraction of the cost of training a foundation model.</td><td>Low per request: a small operational cost to process one inquiry.</td></tr>
+    <tr><td>Speed</td><td>Months of non-stop computing.</td><td>Months to over a year of development and safety testing.</td><td>Hours to days, depending on dataset size.</td><td>Milliseconds to seconds.</td></tr>
+    <tr><td>Where it runs</td><td>Elite cloud data centers with thousands of interconnected GPUs.</td><td>The world's most advanced supercomputing clusters.</td><td>Controlled development or enterprise cloud environments.</td><td>Production environments, live servers or user devices.</td></tr>
+    <tr><td>Human analogy</td><td>Earning a general high school education.</td><td>Earning a pioneering PhD at a world-class institute.</td><td>Taking a specialized corporate training seminar.</td><td>Answering a specific question on the job.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="mini">Cost and time figures are rough orders of magnitude. Real numbers vary a lot by model and year.</p>
+</section>
+
+<section id="analogies">
+  <h2>Twelve more analogies</h2>
+  <p>If the human analogy doesn't land, one of these might. Each follows the same pattern: build the base, push it to the extreme, adapt it, then use it.</p>
+  <div id="list"></div>
+</section>
+
+<section id="engineer">
+  <h2>For software engineers: the same idea in detail</h2>
+  <p>If you think in code, the analogy that clicks best is software architecture. Here is the same four-stage idea mapped to terms you already use.</p>
+
+  <div class="callout">
+    <b>The mapping:</b> Foundation = the framework. Frontier = the state-of-the-art framework. Fine-tuning = the application built on top of it. Inference = the app running in production.
+  </div>
+
+  <div class="analogy">
+    <h3>1. Foundation model = a generic framework</h3>
+    <p><b>The tech translation:</b> the baseline architecture and broad pre-training.</p>
+    <p>Think of Django, Laravel or Spring Boot. A foundation model gives you the core libraries, syntax logic and basic routing. It knows how language and logic work, but it contains zero of your specific business rules or proprietary data.</p>
+  </div>
+  <div class="analogy">
+    <h3>2. Frontier model = a very sophisticated, state-of-the-art framework</h3>
+    <p><b>The tech translation:</b> the bleeding edge of scale, compute and multi-modal engineering.</p>
+    <p>A standard foundation model is a stable, open-source framework. A frontier model is like a highly proprietary, multi-billion-dollar architecture built by elite research teams. It pushes the boundaries of complex reasoning and agentic workflows, representing the absolute ceiling of what the tech can currently do.</p>
+  </div>
+  <div class="analogy">
+    <h3>3. Fine-tuning = targeted solutions on top</h3>
+    <p><b>The tech translation:</b> downstream parameter adaptation and alignment.</p>
+    <p>In traditional software you don't rewrite the framework. You write specific controllers, database schemas and microservices to solve a distinct problem. Fine-tuning adjusts the model's inner weights on a specialized dataset so the generic framework adapts to a targeted vertical, like legal parsing or medical diagnostics.</p>
+  </div>
+  <div class="analogy">
+    <h3>4. Inference = using the solution</h3>
+    <p><b>The tech translation:</b> production execution and serving at runtime.</p>
+    <p>This is simply hitting a live API endpoint or running a compiled binary. The code (the weights) is frozen, deployment is complete, and the system instantly processes real-time user payloads to return an output.</p>
+  </div>
+
+  <h3 style="margin-top:28px">Six of the analogies, in software terms</h3>
+  <details><summary>Software development: from OS architecture to running an app</summary>
+    <p><b>Foundation</b> is like the core Linux operating system: incredibly powerful and versatile, with billions of lines of code, but it doesn't do a specific job until you install software on top of it.</p>
+    <p><b>Frontier</b> is the software-engineering equivalent of a brand-new operating system for an experimental quantum supercomputer. It pushes the boundaries of computer science.</p>
+    <p><b>Fine-tuning</b> is like creating a specialized "distro" (distribution). An enterprise takes the generic Linux OS and modifies the kernel, locks down security and pre-installs financial auditing software for an accounting firm.</p>
+    <p><b>Inference</b> is simply running an app. When an employee opens their calculator and types 2 + 2, the frozen, pre-built operating system instantly delivers the answer: 4.</p></details>
+  <details><summary>Grocery shopping: from mass logistics to the checkout scanner</summary>
+    <p><b>Foundation</b> is a massive wholesale distribution network that stocks millions of raw grocery items. It has everything you could ever need to make any meal on earth, but nothing is cooked or sorted yet.</p>
+    <p><b>Frontier</b> represents elite culinary sourcing: like a supplier using satellites and advanced biotechnology to cultivate a rare, genetically optimized vanilla bean.</p>
+    <p><b>Fine-tuning</b> is a meal-prep company (like HelloFresh) going into that warehouse, grabbing specific items (ground beef, tortillas, spices), packaging them together, and writing a step-by-step instruction card for "Tuesday Taco Night."</p>
+    <p><b>Inference</b> is the instant beep of the checkout scanner. When a grocery item passes over the laser, the computer doesn't recalculate the price from scratch. It just reads the database and displays the price instantly.</p></details>
+  <details><summary>Birth, life and marriage: from general education to on-the-job answers</summary>
+    <p><b>Foundation</b> represents the general upbringing and K-12 education of a human. You learn how language works, basic math, and how to navigate society. You have a "general brain," but you aren't a specialist.</p>
+    <p><b>Frontier</b> is the extreme outlier of human achievement, like an elite scientist with a PhD in astrophysics, a licensed fighter pilot, who also speaks seven languages fluently.</p>
+    <p><b>Fine-tuning</b> is a person who has graduated college and spends months cramming for the Bar Exam or going through a coding bootcamp. You are refining your general brain for a specific career.</p>
+    <p><b>Inference</b> is a daily work action. Once that person becomes a lawyer, a client emails them a question, and the lawyer replies in seconds based on their existing knowledge. They don't go back to law school; they just deliver the answer.</p></details>
+  <details><summary>The zombie apocalypse: from basic survival to reflexive action</summary>
+    <p><b>Foundation</b> is the generic "survival bootcamp" you take before the apocalypse hits. You learn how to light a fire, pitch a tent, and run long distances. You are generally prepared for trouble.</p>
+    <p><b>Frontier</b> is a cyborg super-soldier with experimental nanobots that give night vision and bulletproof skin.</p>
+    <p><b>Fine-tuning</b> is specialized zombie combat: taking a basic survivor and giving them intensive training on how to hotwire a tank and swing a machete.</p>
+    <p><b>Inference</b> is the moment a zombie jumps out of a bush. The survivor instantly uses their muscle memory to land the hit.</p></details>
+  <details><summary>The "cat ownership" analogy (the weird one)</summary>
+    <p><b>Foundation</b> is the universal feline instinct baked into every cat: meowing, scratching, hunting mice, and sleeping 16 hours a day. The cat is born with this programming, and "pre-programmed" is really the point: nobody had to teach it.</p>
+    <p><b>Frontier</b> is the "Super-Cat" experiment: a scientist trying to breed a cat that can speak fluent French and do taxes. It's an eccentric stretch of what a cat could be.</p>
+    <p><b>Fine-tuning</b> is training a cat to use a toilet. You spend frustrating weeks with a specialized kit, teaching a house cat to go in the toilet instead of a litter box.</p>
+    <p><b>Inference</b> is the cat using the toilet. It walks into the bathroom, does its business, knocks over the toilet paper roll, and walks out. The behavior is already learned, and it just runs.</p></details>
+  <details><summary>Full-stack development and end-to-end database flow</summary>
+    <p><b>Foundation</b> is like a massive full-stack framework (Django, Laravel or Rails) when you first install it. It has built-in user authentication templates, security middleware, database connectors and UI components, but it currently does nothing, because it is not yet an app.</p>
+    <p><b>Frontier</b> represents architectural research and development, like engineers building an experimental, ultra-low-latency web stack that compiles directly to WebAssembly and predicts user UI interactions before they happen.</p>
+    <p><b>Fine-tuning</b> is when a developer takes that framework, configures unique database models, sets up specialized webhooks, and maps strict data-validation schemas specifically for processing e-commerce payments.</p>
+    <p><b>Inference</b> is the live production application handling web traffic. A user taps "Pay": the server instantly accepts the HTTP request, runs the static validation code, updates the database, and returns a 200 OK status in 40 milliseconds.</p></details>
+</section>
+
+<section id="glossary">
+  <h2>Other terminology</h2>
+  <p>A few more terms you will hear, grouped by what they help with, each with a software analogy.</p>
+
+  <h3 style="margin-top:22px">1. Data and context: how the AI gets information</h3>
+  <dl>
+    <dt>RAG (Retrieval-Augmented Generation)</dt>
+    <dd>Giving an AI model access to an external database or search tool to look up real-time or private information before answering it.<br><em>Tech analogy: instead of answering from memory, the AI looks up the answer in a reference manual you provide.</em></dd>
+    <dt>Context window</dt>
+    <dd>The maximum amount of data (measured in tokens) that a model can read and process at one single time.<br><em>Tech analogy: the RAM capacity of the program. If your context window is too small, you cannot feed an entire 500-page book into the model at once.</em></dd>
+    <dt>Token / tokenization</dt>
+    <dd>The basic units of text (usually pieces of words or syllables) that an AI reads and processes, rather than a whole string.<br><em>Tech analogy: the raw character tokens or chunks of a string.</em></dd>
+  </dl>
+
+  <h3 style="margin-top:22px">2. Adaptation and optimization: how the AI is modified</h3>
+  <dl>
+    <dt>Prompt engineering</dt>
+    <dd>The craft of structuring instructions, examples and constraints inside a prompt to get the best output without changing the model itself.<br><em>Tech analogy: writing optimized configuration files or parameters to alter software behavior at runtime.</em></dd>
+    <dt>LoRA / QLoRA (Low-Rank Adaptation)</dt>
+    <dd>A lightweight, highly efficient fine-tuning technique. Instead of updating billions of parameters in a model, it freezes the base model and adds a tiny layer of weights on top.<br><em>Tech analogy: writing a plugin or extension rather than modifying the core framework's source code.</em></dd>
+    <dt>Quantization</dt>
+    <dd>A compression technique that reduces the numerical precision of a model's weights (for example, 16-bit floats down to 8-bit or 4-bit integers) to make the model smaller and faster, at a small cost in quality.<br><em>Tech analogy: compressing a 4K video file down to 1080p so it can stream smoothly on mobile networks with minimal quality loss.</em></dd>
+  </dl>
+
+  <h3 style="margin-top:22px">3. Execution and behavior: how the AI behaves in production</h3>
+  <dl>
+    <dt>Hallucination</dt>
+    <dd>When an AI generates text that sounds confident and logical but is factually incorrect or made up.<br><em>Tech analogy: a silent data corruption error. It doesn't trigger a crash or throw an exception, but it outputs wrong calculations.</em></dd>
+    <dt>Agents / agentic workflows</dt>
+    <dd>Autonomous systems where an AI model is given tools (like code execution, web search or database access) and the ability to loop through steps, make decisions, and correct its own mistakes to achieve a high-level goal.<br><em>Tech analogy: an automated cron job or daemon script that runs indefinitely, calling various microservices until a complex task is completed.</em></dd>
+    <dt>Temperature</dt>
+    <dd>A configuration setting used during inference that controls the randomness or creativity of the output. Low temperature (for example 0.1) makes responses deterministic; high temperature (for example 0.9) makes them more creative and varied.<br><em>Tech analogy: setting the strictness level on a validation regex, or a randomization seed.</em></dd>
+  </dl>
+</section>
+
+<section>
+  <h2>Remember this</h2>
+  <ul>
+    <li><b>Foundation</b> builds the general base. It's the expensive part, and only a few organizations do it.</li>
+    <li><b>Frontier</b> is just the strongest foundation model of the moment.</li>
+    <li><b>Fine-tuning</b> is how a general model becomes good at your specific job, and it costs far less than starting over.</li>
+    <li><b>Inference</b> is everything you actually see: the model answering, with its learning already done.</li>
+  </ul>
+</section>
+</main>
+<footer>Written as personal study notes. Figures are approximate and the analogies are simplified on purpose.</footer>
+
+<script>
+const A=[
+["1. Retail banking","The core banking platform: building the mainframe software that processes basic debits, credits and accounts.","The high-frequency trading engine: building an ultra-complex system that automates global trades using predictive algorithms.","Creating a custom loan product: configuring the core system to handle a specific new regional mortgage type.","Processing a debit card swipe: a customer buys groceries, and the system instantly checks their balance and approves it."],
+["2. Household chores","Building a modern house: framing the walls, running the plumbing, and installing the electrical grid.","Installing a smart-home ecosystem: wiring an automated, voice-controlled system for climate, security and lighting.","Painting and staging a nursery: decorating a specific blank bedroom with a crib and toys to prepare for a new baby.","Flipping the light switch: a family member walks into a room, hits the switch, and the light instantly comes on."],
+["3. Construction","Manufacturing raw steel and concrete: pouring foundations and making the structural beams used for any standard building.","Engineering a skyscraper superstructure: designing custom earthquake-proof, mega-tall steel trusses for a 100-story tower.","Installing a commercial kitchen: modifying the floor of the building with commercial ovens and plumbing for a restaurant tenant.","Opening the restaurant doors: a customer walks in, orders food, and the kitchen staff uses the stoves to cook a meal."],
+["4. Culinary / restaurant","Culinary school curriculum: learning foundational cooking techniques like knife skills, master sauces and heat control.","Michelin-star recipe development: elite chefs spending months inventing avant-garde molecular gastronomy dishes.","Adapting a recipe for a catering event: tweaking a standard pasta recipe to make the line cook gluten-free for a wedding.","Plating an order on the line: a diner orders the pasta, and the line chef cooks and serves it to their table in 10 minutes."],
+["5. Automotive industry","Designing a global vehicle platform: engineering a standard chassis and engine frame used across 10 different car models.","Building a Formula 1 race car: pushing the absolute limits of aerodynamics, hybrid engines and lightweight materials.","Converting a van into an ambulance: taking a mass-produced commercial van and retrofitting it with sirens, gurneys and oxygen tanks.","Turning the ignition key: the driver turns the key, the engine ignites, and the car moves down the road on demand."],
+["6. Software development","An open-source OS (Linux): building a massive, general-purpose operating system that can run on phones, PCs or servers.","Quantum OS: developing an experimental, ultra-advanced operating system designed to run on quantum computers.","Creating a custom distro: modifying the standard Linux OS with pre-installed cybersecurity tools to create a hacking-focused system.","Running an app: a user double-clicks an app icon, and the OS instantly executes the code to open the program."],
+["7. Grocery shopping","The megastore inventory: stocking a massive distribution center with every raw ingredient imaginable, from flour to exotic spices.","Sourcing rare ingredients: sending foragers into remote rainforests to find a newly discovered, highly potent truffle species.","Assembling a meal kit box: selecting specific ingredients from the warehouse and boxing them together with a recipe for a Taco Night.","Scanning at checkout: the cashier runs a barcode over the scanner, and the register instantly calculates the price."],
+["8. Birth, life and marriage","Going to K-12 school: getting a general education, learning to read, write, do basic math, and socialize with humans.","Becoming an astronaut-surgeon: pushing the absolute limits of human capability by training to perform open-heart surgery in zero gravity.","Studying for the bar exam: a college graduate spends three months intensely studying laws to pass a specific state's legal exam.","Answering a client's text: the newly minted lawyer reads a text from a client and immediately tells them if an action is legal."],
+["9. The zombie apocalypse (funny)","A survival bootcamp: a grueling six-month camp teaching wilderness survival, basic first aid, foraging, and fitness.","Building a cyborg super-soldier: injecting a human with experimental nanobots to give them night vision and bulletproof skin.","Specializing in zombie combat: taking a basic survivor and giving them intensive training specifically on how to hotwire a tank and swing a machete.","Beheading a zombie: a zombie jumps out of a bush, and the survivor instantly uses their muscle memory to chop its head off."],
+["10. Cat ownership (weird)","Universal feline instincts: the evolutionary programming built into all cats (meowing, scratching, hunting mice, sleeping 16 hours).","The \"Super-Cat\" experiment: an eccentric scientist attempting to breed a cat that can speak fluent French and do taxes.","Training a cat to use a toilet: spending six frustrating weeks using a specialized kit to teach a house cat to poop in the toilet instead of a litter box.","The cat using the toilet: the cat walks into the bathroom, uses the toilet, knocks over the toilet paper roll, and walks out."],
+["11. Full-stack development","The monolithic framework: a massive, generic framework (like Ruby on Rails or Django) containing ORM, and templating tools.","Next-gen web architecture: an experimental web engine that uses decentralized edge compute and automated AI-driven hardware optimization.","Building a specialized API: taking that broad framework and writing dedicated routes, validation logic, and schemas for a Stripe payment gateway.","Hitting a server endpoint: a user clicks \"Buy Now\" on a website, the live server receives the request, and returns a JSON payload."],
+["12. End-to-end database flow","The raw database engine: installing a powerful, relational database like PostgreSQL with indexing and querying engines ready.","Global distributed database: building a planet-scale, multi-region database that instantly syncs petabytes across the globe using quantum-safe cryptography.","Writing a stored procedure: designing a highly optimized, complex SQL view or procedure tailored to monthly payroll for an HR app.","Executing a SQL query: an HR user logs into their dashboard, causing the application to execute the stored procedure and display their paycheck amount."]
+];
+document.getElementById('list').innerHTML=A.map(a=>`<div class="analogy"><h3>${a[0]}</h3><div class="row"><div><b>Foundation</b>${a[1]}</div><div><b>Frontier</b>${a[2]}</div><div><b>Fine-tuning</b>${a[3]}</div><div><b>Inference</b>${a[4]}</div></div></div>`).join('');
+</script>
+</body>
+</html>
